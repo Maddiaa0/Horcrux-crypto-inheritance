@@ -1,12 +1,12 @@
-pragma solidity ^0.7.4;
+// pragma solidity ^0.7.4;
 
-contract ShardManager{
+// contract ShardManager{
     
-    // An enum to list what state the recovery of a token is in
-    enum RecoveryState{Normal, StandardRecovery, AfterDeath};
+//     // An enum to list what state the recovery of a token is in
+//     enum RecoveryState{Normal, StandardRecovery, AfterDeath};
     
-    struct RecoveryToken {
-        RecoveryContract 
-    }
+//     struct RecoveryToken {
+//         RecoveryContract 
+//     }
     
-}
+// }

@@ -1,0 +1,5 @@
+ELEMENT_MNEMONIC: a mnemonic funded with ethereum. 
+ELEMENT_PROVIDER: either http://localhost:8545 for connecting with local ganache network or use an Infura URL that should look like this https://ropsten.infura.io/v3/<API_TOKEN>
+ELEMENT_IPFS_MULTIADDR: either /ip4/127.0.0.1/tcp/5001 for connecting with local IPFS node or /dns4/ipfs.infura.io/tcp/5001/https for connecting through Infura
+ELEMENT_CONTRACT_ADDRESS: "0xD49Da2b7C0A15f6ac5A856f026D68A9B9848D96f"
+ELEMENT_COUCHDB_REMOTE: Only use this if you want to you the replication feature of CouchDB
