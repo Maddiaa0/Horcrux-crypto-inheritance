@@ -1,4 +1,7 @@
+import { mont } from 'bn.js';
 import Crypto from 'crypto'
+import AES from 'crypto-js/aes';
+import local from '../config/local';
 
 
 /**
@@ -9,6 +12,11 @@ import Crypto from 'crypto'
 class KeyManager {
 
     constructor(){
+        // State variables
+        this.mnemonic = null;
+        this.privateKey = null;
+        this.publicKey = null;
+
         // bindings
         this.getPasswordHash = this.getPasswordHash.bind(this);
         this.setPasswordhash = this.setPasswordhash.bind(this);
@@ -90,6 +98,52 @@ class KeyManager {
         let passwordData = this.hasher(password, hash.salt);
         return (passwordData.hashedPassword === hash.hashedPassword) ? true : false;
     }
+
+
+    /** Store Mnomonic in storage
+     * 
+     * Store the users currently used encrypted mnemonic in local storage for later
+     * It is encrypted using the users password 
+     * 
+    * @param {String} mnemonic 
+    * @param {String} password 
+    */
+    storeMnemonicInStorage(mnemonic, password){
+        if (mnemonic == null || password == null){
+            throw new Error("Mnemonic and password are both required");
+        }
+        if (typeof mnemonic !== "string" || typeof password !== "string"){
+            throw new Error("Both mnomonic and the password must be strings");
+        }
+
+        // first hash the mnemonic with the password
+        const encrypted = AES.encrypt(mnemonic, password);
+        localStorage.setItem("mem", encrypted);
+    }
+
+    /**Get Mnemonic from storage
+     * 
+     * 
+     * 
+     * @param {String} password 
+     */
+    getMnemonicFromStorage(password){
+        if (password == null){
+            throw new Error("password is required");
+        }
+        if (typeof password !== "string"){
+            throw new Error("password must be string");
+        }
+
+        const encryptedMem = localStorage.getItem("mem");
+        this.mnemonic = AES.decrypt(encryptedMem, password);
+        return this.mnemonic;
+    }
+
+    
+
+
+
 }
 
 const keyManager = new KeyManager();

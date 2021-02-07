@@ -3,24 +3,24 @@ import Eth from 'ethjs-query'
 import abi from 'ethjs-abi'
 import BN from 'bn.js'
 import EthContract from 'ethjs-contract'
-import DidRegistryContract from '../contracts/ethr-did-registry.json'
+import DidRegistryContract from '../contracts/EthereumDIDRegistry.json'
 import { Buffer } from 'buffer'
-import { toEthereumAddress } from './utils'
+import { toEthereumAddress } from './ResolverUtils'
 
 const REGISTRY = '0xdca7ef03e98e0dc2b855be647c39abe984fcf21b'
 
 const identifierMatcher = /^(.*)?(0x[0-9a-fA-F]{40}|0x[0-9a-fA-F]{66})$/
 
-function bytes32toString(bytes32) {
+export function bytes32toString(bytes32) {
   return Buffer.from(bytes32.slice(2), 'hex').toString('utf8').replace(/\0+$/, '')
 }
 
-function stringToBytes32(str) {
+export function stringToBytes32(str) {
   const buffstr = '0x' + Buffer.from(str).slice(0, 32).toString('hex')
   return buffstr + '0'.repeat(66 - buffstr.length)
 }
 
-const delegateTypes = {
+export const delegateTypes = {
   Secp256k1SignatureAuthentication2018: stringToBytes32('sigAuth'),
   Secp256k1VerificationKey2018: stringToBytes32('veriKey')
 }
@@ -233,7 +233,7 @@ function validateNetworksAgainstConfig(networks = {}, conf = {}) {
   }
 }
 
-function getResolver(conf = {}) {
+export function getResolver(conf = {}) {
   const logDecoder = abi.logDecoder(DidRegistryContract, false)
 
   const networks = {
@@ -306,13 +306,13 @@ function getResolver(conf = {}) {
   return { ethr: resolve }
 }
 
-module.exports = {
-  REGISTRY,
-  bytes32toString,
-  stringToBytes32,
-  delegateTypes,
-  attrTypes,
-  wrapDidDocument,
-  getResolver,
-  identifierMatcher
-}
+// module.exports = {
+//   REGISTRY,
+//   bytes32toString,
+//   stringToBytes32,
+//   delegateTypes,
+//   attrTypes,
+//   wrapDidDocument,
+//   getResolver,
+//   identifierMatcher
+// }

@@ -38,11 +38,12 @@ class App extends Component {
           deployedNetwork && deployedNetwork.address,
       );
       this.RegInstance = RegInstance;
+      
 
       // Set web3, accounts, and contract to the state, and then proceed with an
       // example of interacting with the contract's methods.
       // this.setState({ web3, accounts, contract: instance }, this.runExample);
-      await identityManager.initTruffleResolver("0xfd5aBAf8ECDf652d74a42108745c87Be82AD1F8f");
+      await identityManager.initTruffleResolver(RegInstance.address);
       this.listenToAttributeEvents(RegInstance);
       this.setState({web3: web3});
     } catch (error) {

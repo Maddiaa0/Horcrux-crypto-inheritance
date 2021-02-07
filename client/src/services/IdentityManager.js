@@ -14,6 +14,7 @@ import { createJWT, verifyJWT, SimpleSigner, toEthereumAddress, Signer } from 'd
 
 import {Resolver } from 'did-resolver';
 import {getResolver, stringToBytes32 ,delegateTypes} from "ethr-did-resolver" 
+// import {getResolver, stringToBytes32, delegateTypes } from "./DidEthResolver";
 import getWeb3 from '../getWeb3';
 import Web3 from 'web3';
 
@@ -118,6 +119,10 @@ class IdentityManager {
         ));
     }
     
+    /**
+     * Initialise a resolver running off of the truffle development chain
+     * @param {String} registryContractAddress 
+     */
     async initTruffleResolver(registryContractAddress){
         const providerConfig = {
             rpcUrl: "http://localhost:8545",
