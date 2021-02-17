@@ -1,315 +1,317 @@
-pragma solidity ^0.4.21;
+// SPDX-License-Identifier: UNLICENSED
 
-contract EthereumDIDRegistry {
-    mapping(address => address) public owners;
-    mapping(address => mapping(bytes32 => mapping(address => uint256)))
-        public delegates;
-    mapping(address => uint256) public changed;
-    mapping(address => uint256) public nonce;
+// pragma solidity ^0.4.21;
 
-    modifier onlyOwner(address identity, address actor) {
-        require(actor == identityOwner(identity));
-        _;
-    }
+// contract EthereumDIDRegistry {
+//     mapping(address => address) public owners;
+//     mapping(address => mapping(bytes32 => mapping(address => uint256)))
+//         public delegates;
+//     mapping(address => uint256) public changed;
+//     mapping(address => uint256) public nonce;
 
-    event DIDOwnerChanged(
-        address indexed identity,
-        address owner,
-        uint256 previousChange
-    );
+//     modifier onlyOwner(address identity, address actor) {
+//         require(actor == identityOwner(identity));
+//         _;
+//     }
 
-    event DIDDelegateChanged(
-        address indexed identity,
-        bytes32 delegateType,
-        address delegate,
-        uint256 validTo,
-        uint256 previousChange
-    );
+//     event DIDOwnerChanged(
+//         address indexed identity,
+//         address owner,
+//         uint256 previousChange
+//     );
 
-    event DIDAttributeChanged(
-        address indexed identity,
-        bytes32 name,
-        bytes value,
-        uint256 validTo,
-        uint256 previousChange
-    );
+//     event DIDDelegateChanged(
+//         address indexed identity,
+//         bytes32 delegateType,
+//         address delegate,
+//         uint256 validTo,
+//         uint256 previousChange
+//     );
 
-    function identityOwner(address identity) public view returns (address) {
-        address owner = owners[identity];
-        if (owner != 0x0) {
-            return owner;
-        }
-        return identity;
-    }
+//     event DIDAttributeChanged(
+//         address indexed identity,
+//         bytes32 name,
+//         bytes value,
+//         uint256 validTo,
+//         uint256 previousChange
+//     );
 
-    function checkSignature(
-        address identity,
-        uint8 sigV,
-        bytes32 sigR,
-        bytes32 sigS,
-        bytes32 hash
-    ) internal returns (address) {
-        address signer = ecrecover(hash, sigV, sigR, sigS);
-        require(signer == identityOwner(identity));
-        nonce[signer]++;
-        return signer;
-    }
+//     function identityOwner(address identity) public view returns (address) {
+//         address owner = owners[identity];
+//         if (owner != 0x0) {
+//             return owner;
+//         }
+//         return identity;
+//     }
 
-    function validDelegate(
-        address identity,
-        bytes32 delegateType,
-        address delegate
-    ) public view returns (bool) {
-        uint256 validity =
-            delegates[identity][keccak256(delegateType)][delegate];
-        return (validity > now);
-    }
+//     function checkSignature(
+//         address identity,
+//         uint8 sigV,
+//         bytes32 sigR,
+//         bytes32 sigS,
+//         bytes32 hash
+//     ) internal returns (address) {
+//         address signer = ecrecover(hash, sigV, sigR, sigS);
+//         require(signer == identityOwner(identity));
+//         nonce[signer]++;
+//         return signer;
+//     }
 
-    function changeOwner(
-        address identity,
-        address actor,
-        address newOwner
-    ) internal onlyOwner(identity, actor) {
-        owners[identity] = newOwner;
-        emit DIDOwnerChanged(identity, newOwner, changed[identity]);
-        changed[identity] = block.number;
-    }
+//     function validDelegate(
+//         address identity,
+//         bytes32 delegateType,
+//         address delegate
+//     ) public view returns (bool) {
+//         uint256 validity =
+//             delegates[identity][keccak256(delegateType)][delegate];
+//         return (validity > now);
+//     }
 
-    function changeOwner(address identity, address newOwner) public {
-        changeOwner(identity, msg.sender, newOwner);
-    }
+//     function changeOwner(
+//         address identity,
+//         address actor,
+//         address newOwner
+//     ) internal onlyOwner(identity, actor) {
+//         owners[identity] = newOwner;
+//         emit DIDOwnerChanged(identity, newOwner, changed[identity]);
+//         changed[identity] = block.number;
+//     }
 
-    function changeOwnerSigned(
-        address identity,
-        uint8 sigV,
-        bytes32 sigR,
-        bytes32 sigS,
-        address newOwner
-    ) public {
-        bytes32 hash =
-            keccak256(
-                bytes1(0x19),
-                bytes1(0),
-                this,
-                nonce[identityOwner(identity)],
-                identity,
-                "changeOwner",
-                newOwner
-            );
-        changeOwner(
-            identity,
-            checkSignature(identity, sigV, sigR, sigS, hash),
-            newOwner
-        );
-    }
+//     function changeOwner(address identity, address newOwner) public {
+//         changeOwner(identity, msg.sender, newOwner);
+//     }
 
-    function addDelegate(
-        address identity,
-        address actor,
-        bytes32 delegateType,
-        address delegate,
-        uint256 validity
-    ) internal onlyOwner(identity, actor) {
-        delegates[identity][keccak256(delegateType)][delegate] = now + validity;
-        emit DIDDelegateChanged(
-            identity,
-            delegateType,
-            delegate,
-            now + validity,
-            changed[identity]
-        );
-        changed[identity] = block.number;
-    }
+//     function changeOwnerSigned(
+//         address identity,
+//         uint8 sigV,
+//         bytes32 sigR,
+//         bytes32 sigS,
+//         address newOwner
+//     ) public {
+//         bytes32 hash =
+//             keccak256(
+//                 bytes1(0x19),
+//                 bytes1(0),
+//                 this,
+//                 nonce[identityOwner(identity)],
+//                 identity,
+//                 "changeOwner",
+//                 newOwner
+//             );
+//         changeOwner(
+//             identity,
+//             checkSignature(identity, sigV, sigR, sigS, hash),
+//             newOwner
+//         );
+//     }
 
-    function addDelegate(
-        address identity,
-        bytes32 delegateType,
-        address delegate,
-        uint256 validity
-    ) public {
-        addDelegate(identity, msg.sender, delegateType, delegate, validity);
-    }
+//     function addDelegate(
+//         address identity,
+//         address actor,
+//         bytes32 delegateType,
+//         address delegate,
+//         uint256 validity
+//     ) internal onlyOwner(identity, actor) {
+//         delegates[identity][keccak256(delegateType)][delegate] = now + validity;
+//         emit DIDDelegateChanged(
+//             identity,
+//             delegateType,
+//             delegate,
+//             now + validity,
+//             changed[identity]
+//         );
+//         changed[identity] = block.number;
+//     }
 
-    function addDelegateSigned(
-        address identity,
-        uint8 sigV,
-        bytes32 sigR,
-        bytes32 sigS,
-        bytes32 delegateType,
-        address delegate,
-        uint256 validity
-    ) public {
-        bytes32 hash =
-            keccak256(
-                bytes1(0x19),
-                bytes1(0),
-                this,
-                nonce[identityOwner(identity)],
-                identity,
-                "addDelegate",
-                delegateType,
-                delegate,
-                validity
-            );
-        addDelegate(
-            identity,
-            checkSignature(identity, sigV, sigR, sigS, hash),
-            delegateType,
-            delegate,
-            validity
-        );
-    }
+//     function addDelegate(
+//         address identity,
+//         bytes32 delegateType,
+//         address delegate,
+//         uint256 validity
+//     ) public {
+//         addDelegate(identity, msg.sender, delegateType, delegate, validity);
+//     }
 
-    function revokeDelegate(
-        address identity,
-        address actor,
-        bytes32 delegateType,
-        address delegate
-    ) internal onlyOwner(identity, actor) {
-        delegates[identity][keccak256(delegateType)][delegate] = now;
-        emit DIDDelegateChanged(
-            identity,
-            delegateType,
-            delegate,
-            now,
-            changed[identity]
-        );
-        changed[identity] = block.number;
-    }
+//     function addDelegateSigned(
+//         address identity,
+//         uint8 sigV,
+//         bytes32 sigR,
+//         bytes32 sigS,
+//         bytes32 delegateType,
+//         address delegate,
+//         uint256 validity
+//     ) public {
+//         bytes32 hash =
+//             keccak256(
+//                 bytes1(0x19),
+//                 bytes1(0),
+//                 this,
+//                 nonce[identityOwner(identity)],
+//                 identity,
+//                 "addDelegate",
+//                 delegateType,
+//                 delegate,
+//                 validity
+//             );
+//         addDelegate(
+//             identity,
+//             checkSignature(identity, sigV, sigR, sigS, hash),
+//             delegateType,
+//             delegate,
+//             validity
+//         );
+//     }
 
-    function revokeDelegate(
-        address identity,
-        bytes32 delegateType,
-        address delegate
-    ) public {
-        revokeDelegate(identity, msg.sender, delegateType, delegate);
-    }
+//     function revokeDelegate(
+//         address identity,
+//         address actor,
+//         bytes32 delegateType,
+//         address delegate
+//     ) internal onlyOwner(identity, actor) {
+//         delegates[identity][keccak256(delegateType)][delegate] = now;
+//         emit DIDDelegateChanged(
+//             identity,
+//             delegateType,
+//             delegate,
+//             now,
+//             changed[identity]
+//         );
+//         changed[identity] = block.number;
+//     }
 
-    function revokeDelegateSigned(
-        address identity,
-        uint8 sigV,
-        bytes32 sigR,
-        bytes32 sigS,
-        bytes32 delegateType,
-        address delegate
-    ) public {
-        bytes32 hash =
-            keccak256(
-                bytes1(0x19),
-                bytes1(0),
-                this,
-                nonce[identityOwner(identity)],
-                identity,
-                "revokeDelegate",
-                delegateType,
-                delegate
-            );
-        revokeDelegate(
-            identity,
-            checkSignature(identity, sigV, sigR, sigS, hash),
-            delegateType,
-            delegate
-        );
-    }
+//     function revokeDelegate(
+//         address identity,
+//         bytes32 delegateType,
+//         address delegate
+//     ) public {
+//         revokeDelegate(identity, msg.sender, delegateType, delegate);
+//     }
 
-    function setAttribute(
-        address identity,
-        address actor,
-        bytes32 name,
-        bytes value,
-        uint256 validity
-    ) internal onlyOwner(identity, actor) {
-        emit DIDAttributeChanged(
-            identity,
-            name,
-            value,
-            now + validity,
-            changed[identity]
-        );
-        changed[identity] = block.number;
-    }
+//     function revokeDelegateSigned(
+//         address identity,
+//         uint8 sigV,
+//         bytes32 sigR,
+//         bytes32 sigS,
+//         bytes32 delegateType,
+//         address delegate
+//     ) public {
+//         bytes32 hash =
+//             keccak256(
+//                 bytes1(0x19),
+//                 bytes1(0),
+//                 this,
+//                 nonce[identityOwner(identity)],
+//                 identity,
+//                 "revokeDelegate",
+//                 delegateType,
+//                 delegate
+//             );
+//         revokeDelegate(
+//             identity,
+//             checkSignature(identity, sigV, sigR, sigS, hash),
+//             delegateType,
+//             delegate
+//         );
+//     }
 
-    function setAttribute(
-        address identity,
-        bytes32 name,
-        bytes value,
-        uint256 validity
-    ) public {
-        setAttribute(identity, msg.sender, name, value, validity);
-    }
+//     function setAttribute(
+//         address identity,
+//         address actor,
+//         bytes32 name,
+//         bytes value,
+//         uint256 validity
+//     ) internal onlyOwner(identity, actor) {
+//         emit DIDAttributeChanged(
+//             identity,
+//             name,
+//             value,
+//             now + validity,
+//             changed[identity]
+//         );
+//         changed[identity] = block.number;
+//     }
 
-    function setAttributeSigned(
-        address identity,
-        uint8 sigV,
-        bytes32 sigR,
-        bytes32 sigS,
-        bytes32 name,
-        bytes value,
-        uint256 validity
-    ) public {
-        bytes32 hash =
-            keccak256(
-                bytes1(0x19),
-                bytes1(0),
-                this,
-                nonce[identityOwner(identity)],
-                identity,
-                "setAttribute",
-                name,
-                value,
-                validity
-            );
-        setAttribute(
-            identity,
-            checkSignature(identity, sigV, sigR, sigS, hash),
-            name,
-            value,
-            validity
-        );
-    }
+//     function setAttribute(
+//         address identity,
+//         bytes32 name,
+//         bytes value,
+//         uint256 validity
+//     ) public {
+//         setAttribute(identity, msg.sender, name, value, validity);
+//     }
 
-    function revokeAttribute(
-        address identity,
-        address actor,
-        bytes32 name,
-        bytes value
-    ) internal onlyOwner(identity, actor) {
-        emit DIDAttributeChanged(identity, name, value, 0, changed[identity]);
-        changed[identity] = block.number;
-    }
+//     function setAttributeSigned(
+//         address identity,
+//         uint8 sigV,
+//         bytes32 sigR,
+//         bytes32 sigS,
+//         bytes32 name,
+//         bytes value,
+//         uint256 validity
+//     ) public {
+//         bytes32 hash =
+//             keccak256(
+//                 bytes1(0x19),
+//                 bytes1(0),
+//                 this,
+//                 nonce[identityOwner(identity)],
+//                 identity,
+//                 "setAttribute",
+//                 name,
+//                 value,
+//                 validity
+//             );
+//         setAttribute(
+//             identity,
+//             checkSignature(identity, sigV, sigR, sigS, hash),
+//             name,
+//             value,
+//             validity
+//         );
+//     }
 
-    function revokeAttribute(
-        address identity,
-        bytes32 name,
-        bytes value
-    ) public {
-        revokeAttribute(identity, msg.sender, name, value);
-    }
+//     function revokeAttribute(
+//         address identity,
+//         address actor,
+//         bytes32 name,
+//         bytes value
+//     ) internal onlyOwner(identity, actor) {
+//         emit DIDAttributeChanged(identity, name, value, 0, changed[identity]);
+//         changed[identity] = block.number;
+//     }
 
-    function revokeAttributeSigned(
-        address identity,
-        uint8 sigV,
-        bytes32 sigR,
-        bytes32 sigS,
-        bytes32 name,
-        bytes value
-    ) public {
-        bytes32 hash =
-            keccak256(
-                bytes1(0x19),
-                bytes1(0),
-                this,
-                nonce[identityOwner(identity)],
-                identity,
-                "revokeAttribute",
-                name,
-                value
-            );
-        revokeAttribute(
-            identity,
-            checkSignature(identity, sigV, sigR, sigS, hash),
-            name,
-            value
-        );
-    }
-}
+//     function revokeAttribute(
+//         address identity,
+//         bytes32 name,
+//         bytes value
+//     ) public {
+//         revokeAttribute(identity, msg.sender, name, value);
+//     }
+
+//     function revokeAttributeSigned(
+//         address identity,
+//         uint8 sigV,
+//         bytes32 sigR,
+//         bytes32 sigS,
+//         bytes32 name,
+//         bytes value
+//     ) public {
+//         bytes32 hash =
+//             keccak256(
+//                 bytes1(0x19),
+//                 bytes1(0),
+//                 this,
+//                 nonce[identityOwner(identity)],
+//                 identity,
+//                 "revokeAttribute",
+//                 name,
+//                 value
+//             );
+//         revokeAttribute(
+//             identity,
+//             checkSignature(identity, sigV, sigR, sigS, hash),
+//             name,
+//             value
+//         );
+//     }
+// }

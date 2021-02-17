@@ -24,12 +24,17 @@ import HttpProvider from 'ethjs-provider-http'
 // registry contract local
 import DidRegContract from '../contracts/EthereumDIDRegistry.json'; 
 
+
+import verAgent, { agent } from "./VeramoService";
+
 // get registry
 const DidRegistryContract = require("ethr-did-registry");
 
 
 
-
+// The kovan RPC url for my network
+const KOVAN_RPC_URL = "https://kovan.infura.io/v3/bd43a2a9349a4c05af34e872b1872563";
+const KOVAN_ADDR = "0xdca7ef03e98e0dc2b855be647c39abe984fcf21b";
 
 
 
@@ -51,6 +56,24 @@ class IdentityManager {
     }
 
 
+    // using the agent
+    async resolveDiVerd(did){
+        return agent.resolveDid(did);
+    }
+
+    async addServiceVer(did){
+        const result = await agent.addService(
+            did,
+            {
+                id: "srv",
+                type:"Storage",
+                serviceEndpoint: "www.test.com"
+            }
+        );
+        console.log(result);
+    }
+
+
     /**Create and sign a local DID
      * 
      * @param {*} ethAdress 
@@ -65,6 +88,16 @@ class IdentityManager {
         let address = ethAdress;
         let rpcUrl = "https://ropsten.infura.io/v3/bd43a2a9349a4c05af34e872b1872563";
         const ethrDid = new EtherDID({provider, registry, address, privateKey})
+        return ethrDid;
+    }
+
+    async didEtherCreateKovan(ethAddress, provider){
+        
+        let registry = KOVAN_ADDR;
+        let address = ethAddress;
+        // rememebr to remove this this is from a metamask acc
+        let privateKey = "353fdc61cd2cb0ed27ef3fd12a1cca18128592be63aeb27c54dd05acaf574901";
+        const ethrDid = new EtherDID({provider, registry, address, privateKey});
         return ethrDid;
     }
 
@@ -133,6 +166,15 @@ class IdentityManager {
         );
     }
 
+    async initKovanResolver(){
+        const providerConfig = {
+            rpcUrl: KOVAN_RPC_URL,
+        }
+        this.resolver = new Resolver(
+            getResolver(providerConfig)
+        );
+    }
+
     // TODO: set this up to work with ropsten
     async initResolver(didReg, web3){
         const providerConfig = { 
@@ -187,6 +229,14 @@ class IdentityManager {
         console.log(encoded);
 
         await etherDidInstance.setAttribute(serviceEndpointName, serviceEndpoint, 100000000);
+    }
+
+
+    async addDelegate(etherDidInsatnce, delegateAddr){
+        await etherDidInsatnce.addDelegate(delegateAddr, {
+            expiresIn: 3600,
+            delegateType: "sigAuth"
+        });
     }
 
 

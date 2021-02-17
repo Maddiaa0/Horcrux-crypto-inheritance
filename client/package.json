@@ -13,6 +13,7 @@
     "@sidetree/wallet": "^0.2.3-unstable.1",
     "@transmute/element-lib": "^0.8.4",
     "@transmute/universal-wallet": "^0.4.1",
+    "@veramo/key-manager": "^1.1.0",
     "bn.js": "^5.1.3",
     "buffer": "^6.0.3",
     "crypto": "^1.0.1",
