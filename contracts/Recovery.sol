@@ -14,40 +14,39 @@ contract Recovery is Ownable {
     // a user can revoke a particular shard holder from being user by storing by blacklisting them here
     mapping(address => bool) public shardHolders;
     mapping(address => bool) public blacklisted;
-    mapping(address => bool) pubKeyGathered;
-
-    address[] trustees;
-
-    // each user will send a transaction to the block chain which will get their public key
+    mapping(address => bool) public confirmed; // trustees can send a transaction from their own account to the contract so that they can show up as confirmed
     mapping(address => string) publicKeys;
+    mapping(address => bool) pubKeyGathered;
+    uint256 public currentChange; //The block number when a public key was verified, so that the transaction can be found
+    address[] trustees;
+    uint8 recoveryThreshold = 0;
 
     // The current recovery state of the contract
     //TODO: Set recovery state along the chain
     RecoveryState recoveryState;
-
     // Will be set if a trustee has triggered recovery
     address trusteeTriggeredRecovery;
-
-    // The parent contract
     ShardManager parentContract;
-
-    // The NFT contract
     ShardNFT nftContract;
 
+    event TrusteeVerified(
+        address indexed account,
+        address owner,
+        uint256 previousChange
+    );
+
     /**
-     * TODO: not sure if the recovery threshold is required rn
+     *
      */
     constructor(
         ShardManager _parentContract,
         address _owner,
-        uint256 _recoveryThreshold
-    ) public {
+        uint8 _recoveryThreshold
+    ) {
         parentContract = _parentContract;
         nftContract = new ShardNFT(this, _owner);
         transferOwnership(_owner);
-        // nftContract = new ShardNFT(this, _owner);
-
-        // not sure what to do about recovery thresh rn
+        recoveryThreshold = _recoveryThreshold;
     }
 
     function getNFTAddress() public view onlyOwner returns (address) {
@@ -91,6 +90,10 @@ contract Recovery is Ownable {
      * Only the owner can provide this operation
      */
     function blackListShardholder(address _toBlacklist) public onlyOwner {
+        blacklisted[_toBlacklist] = true;
+    }
+
+    function removeBlacklistShardholder(address _toBlacklist) public onlyOwner {
         blacklisted[_toBlacklist] = false;
     }
 
@@ -101,6 +104,15 @@ contract Recovery is Ownable {
         returns (bool)
     {
         return blacklisted[_view];
+    }
+
+    /** Confirm Trustee
+     */
+    function confirmTrustee() public {
+        require(shardHolders[msg.sender], "Sender is not a trustee");
+        confirmed[msg.sender] = true;
+        emit TrusteeVerified(msg.sender, this.owner(), currentChange);
+        currentChange = block.number;
     }
 
     function sendShardToShardOwner(address _shardOwner, string memory _shardURI)

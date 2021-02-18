@@ -37,7 +37,7 @@ contract ShardManager {
     ) public {
         // create the new recovery contract
         Recovery userRecoveryContract =
-            new Recovery(this, _recoveryContractOwner, uint256(_threshold));
+            new Recovery(this, _recoveryContractOwner, uint8(_threshold));
 
         // update the contract mappings struct
         contractMappings[_recoveryContractOwner]

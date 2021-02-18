@@ -65,12 +65,21 @@ contract("Recovery Contract", accounts => {
     it("Blacklists a trustee correctly", async function(){
         const result = await deployedRecovery.blackListShardholder(notGovernance, {from: goverance});
         const isBlackListed = await deployedRecovery.viewBlacklisted(notGovernance, {from: goverance});
+
+        expect(isBlackListed).to.equal(true);
     });
 
     it("Should not allow non-owner accounts to view or add blacklist", async function(){
         await expectRevert(deployedRecovery.blackListShardholder(accountAlice, {from:notGovernance}), "Ownable: caller is not the owner");
         await expectRevert(deployedRecovery.viewBlacklisted(accountAlice, {from:notGovernance}), "Ownable: caller is not the owner");
     });
+
+    it("Should remove a user from the blacklist", async function(){
+        const result = await deployedRecovery.removeBlacklistShardholder(notGovernance, {from:goverance});
+        const isBlacklisted = await deployedRecovery.viewBlacklisted(notGovernance, {from:goverance});
+
+        expect(isBlacklisted).to.equal(false);
+    })
   });
 
 
@@ -130,6 +139,61 @@ contract("Recovery Contract", accounts => {
   });
 
   describe("Responding to Recovery Event", async function(){
+    beforeEach(async function() {
+        deployedRecovery = await RecoveryContract.new(
+            ShardManagerContract.address, goverance, new BN(3)
+        );
+    });
+
+    it("Does not allow user to respond to recovery event if recovery has not been initilaised", async function(){
+        await expectRevert(deployedRecovery.sendShardToRecoveryInitialiser("Test"), "Recovery not yet initialised");
+    });
+
+    it("Does not allow untrusteed user to send their own recovery NFT", async function(){
+        // add alice as a shardholder
+        const result = await deployedRecovery.addShardholder(accountAlice, {from: goverance});
+        const isShardHolder = await deployedRecovery.viewShardholder(accountAlice, {from: goverance});
+        expect(isShardHolder).to.be.equal(true);
+
+        // Make alice send out recovery
+        await deployedRecovery.triggerRecoveryEvent("Test", {from: accountAlice});
+
+        // bob is not allowed to send his recovery NFT
+        await expectRevert(deployedRecovery.sendShardToRecoveryInitialiser("Test", {from: accountBob}), "Not a valid Trustee");
+    });
+
+    it("Successfully allows trusted user to send recovery NFT", async function(){
+        // add alice and bob as shardholders
+        await deployedRecovery.addShardholder(accountAlice, {from: goverance});
+        await deployedRecovery.addShardholder(accountBob, {from: goverance});
+        const isAliceShardHolder = await deployedRecovery.viewShardholder(accountAlice, {from: goverance});
+        const isBobShardHolder = await deployedRecovery.viewShardholder(accountBob, {from:goverance});
+        expect(isAliceShardHolder).to.be.equal(true);
+        expect(isBobShardHolder).to.be.equal(true);
+
+        // Make alice send out a recovery event with a particular payload
+        await deployedRecovery.triggerRecoveryEvent("Test", {from: accountAlice});
+        
+        // Check that the recovery NFT has been issued to alice the trustees account
+        const NFTContractAddress = await deployedRecovery.getNFTAddress();
+        const NFTInstance = await NFTContract.at(NFTContractAddress);
+
+        const bobBalance = await NFTInstance.balanceOf(accountBob, {from: goverance});
+        expect(bobBalance).to.be.a.bignumber.equal(new BN(1)); 
+        
+        const aliceToken = await NFTInstance.tokenURI(1);
+        expect(aliceToken).to.be.equal("Test");
+
+        // bob sends his shard token to alice
+        await deployedRecovery.sendShardToRecoveryInitialiser("Returned From Bob", {from: accountBob});
+        
+        // alice should now be in possession of 2 tokens
+        const aliceBalance = await NFTInstance.balanceOf(accountAlice, {from: goverance});
+        expect(aliceBalance).to.be.a.bignumber.equal(new BN(2));
+        
+        const bobRecoveryToken = await NFTInstance.tokenURI(3);
+        expect(bobRecoveryToken).to.be.equal("Returned From Bob");
+    });
 
   });
 
