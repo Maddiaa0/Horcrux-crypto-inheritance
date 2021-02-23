@@ -168,7 +168,9 @@ class IdentityManager {
 
     async initKovanResolver(){
         const providerConfig = {
-            rpcUrl: KOVAN_RPC_URL,
+            networks: [
+                { name: "kovan", rpcUrl: KOVAN_RPC_URL }
+              ]
         }
         this.resolver = new Resolver(
             getResolver(providerConfig)
@@ -218,8 +220,8 @@ class IdentityManager {
     }
 
     async addIPNSEndpointToDid(etherDidInstance){
-        const serviceEndpointName = "did/src/CryptoVault";
-        const serviceEndpoint = "asd"; //todo: work out how to create presigned endpoints here
+        const serviceEndpointName = "did/service/CryptoVault";
+        const serviceEndpoint = "Qnasddasd7ya54d75sd"; //todo: work out how to create presigned endpoints here
 
         const bytes = stringToBytes32(serviceEndpointName);
         const encoded = this.attributeToHex(serviceEndpointName, serviceEndpoint);
@@ -229,6 +231,7 @@ class IdentityManager {
         console.log(encoded);
 
         await etherDidInstance.setAttribute(serviceEndpointName, serviceEndpoint, 100000000);
+        return true;
     }
 
 

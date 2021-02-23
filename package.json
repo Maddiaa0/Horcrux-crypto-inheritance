@@ -9,6 +9,7 @@
   "dependencies": {
     "@openzeppelin/contracts": "^3.4.0",
     "@openzeppelin/test-helpers": "^0.5.10",
+    "abi-decoder": "^2.4.0",
     "chai": "^4.3.0",
     "chai-as-promised": "^7.1.1",
     "chai-bn": "^0.2.1",

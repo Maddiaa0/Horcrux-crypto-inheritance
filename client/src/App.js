@@ -11,6 +11,11 @@ import identityManager from "./services/IdentityManager";
 
 import DidRegContract from "./contracts/EthereumDIDRegistry.json";
 
+// crypto
+import abi from 'abi-decoder';
+import abiDecoder from "abi-decoder";
+
+
 // set up registry contract
 const DidRegistryContract = require('ethr-did-registry')
 
@@ -37,9 +42,9 @@ function App(){
         //   deployedNetwork && deployedNetwork.address,
         // );
   
-        const deployedNetwork = DidRegContract.networks[5777];
+        const deployedNetwork = DidRegistryContract.networks[42];
         const RegInstance = new web3.eth.Contract(
-            DidRegContract.abi,
+            DidRegistryContract.abi,
             deployedNetwork && deployedNetwork.address,
         );
         setRegInstance(RegInstance);
@@ -53,7 +58,7 @@ function App(){
   
         await identityManager.initKovanResolver();
   
-        // this.listenToAttributeEvents(RegInstance);
+        
         setWeb3(web3);
       } catch (error) {
         // Catch any errors for any of the above operations.
@@ -68,28 +73,16 @@ function App(){
 
   }, []);
 
-  async function runExample(){
-    const { accounts, contract } = this.state;
-
-    // Stores a given value, 5 by default.
-    await contract.methods.set(5).send({ from: accounts[0] });
-
-    // Get the value from the contract to prove it worked.
-    const response = await contract.methods.get().call();
-
-    // Update state with the result.
-    this.setState({ storageValue: response });
-  };
-
 
   function listenToAttributeEvents(instance){
-    instance.events.DIDAttributeChanged({identity: "0x21f754ef0adb6279b03d2a2821a8fa667779fe06"}).on("data", async (data) => {
+    instance.events.DIDAttributeChanged({identity: ethDid.address}).on("data", async (data) => {
       console.log("Attribute update event logged");
       console.log(data);
       console.log("new resolved");
-      const resolved = await identityManager.resolveDid("did:ethr:0x21f754ef0adb6279b03d2a2821a8fa667779fe06");
+      const resolved = await identityManager.resolveDid(ethDid.did);
       console.log(resolved);
     });
+    console.log("Event listening started");
     // this.tokenInstance.events.Transfer({to: this.accounts[0]}).on("data", this.updateUserTokens);
   }
 
@@ -150,15 +143,16 @@ function App(){
     console.log(resolved2);
   }
 
+
   async function resolveDid(evt){
     evt.preventDefault();
 
     
-    const resolved = await identityManager.resolveDid(ethDid.did);
+    const resolved = await identityManager.resolveDid("did:ethr:kovan:0x08Eda6a573cc95D51C0A8b73b7CCd3390AB65Aa2");
     console.log(resolved);   
 
-    const res2 = await identityManager.resolveDidVer(ethDid.did);
-    console.log(res2);
+    // const res2 = await identityManager.resolveDidVer(ethDid.did);
+    // console.log(res2);
   }
 
 
@@ -168,6 +162,72 @@ function App(){
     // console.log(tempKeyPair);
     console.log(web3.eth.accounts[0]);
     await identityManager.addDelegate(ethDid,"0x1722Dd5037C27b6bAdCEEA0EE3a5a996313C9fC8");
+  }
+  
+
+  /**
+   * This method is currently a hack to allow the last commited ipfs endpoint to be queried from the did identifier - ipns will be used
+   */
+  async function getPreviousLogs(){
+
+    function bytes32toString(bytes32) {
+      return Buffer.from(bytes32.slice(2), 'hex').toString('utf8').replace(/\0+$/, '')
+    }
+
+    //check if the did has been registered
+    if (!ethDid){
+      console.log("Did not created yet, cannot track");
+      return false;
+    } 
+
+    var lastChanged = await regInstance.methods.changed(ethDid.address).call();
+    console.log(lastChanged);
+
+
+    // if there has been a change then traverse the logs for information
+    if (lastChanged) {
+      const identityController = await regInstance.methods.identityOwner(ethDid.address).call();
+      console.log(identityController);
+
+      while (lastChanged){
+        const changeBlockNumber = lastChanged;
+
+        
+        const logs = await web3.eth.getPastLogs(
+          {
+            address: regInstance.address,
+            topics: [null, `0x000000000000000000000000${ethDid.address.slice(2)}`],
+            fromBlock: lastChanged,
+            toBlock: lastChanged
+          }
+        )
+
+        abiDecoder.addABI(DidRegistryContract.abi);
+
+         console.log(logs[0].data);
+
+         const decodedParameters = abiDecoder.decodeLogs(logs);
+         console.log(decodedParameters);
+
+         const endpointName = bytes32toString(decodedParameters[0].events[1].value);
+         const endpointVal = bytes32toString(decodedParameters[0].events[2].value); 
+
+         console.log(endpointName);
+         console.log(endpointVal);
+         return {
+           endpointName: endpointName,
+           endpointVal: endpointVal
+         };
+
+
+
+        //  const logData = abi.logDecoder(DidRegistryContract.abi, false);
+          // console.log(logData().data.toString());
+         lastChanged = undefined;
+          
+      }
+
+    }
   }
 
   
@@ -179,8 +239,10 @@ function App(){
       {/* <FirstTimeFlow></FirstTimeFlow> */}
       <button type="button" onClick={handleClick}>get did</button>
       <button type="button" onClick={addIpns}>add endpoint</button>
+      <button type="button" onClick={() => listenToAttributeEvents(regInstance)}>listen</button>
       <button type="button" onClick={resolveDid}>resolveDid</button>
-      <button type="button" onClick={addDelegate}>addDelegate</button>
+      <button type="button" onClick={getPreviousLogs}>get logs</button>
+
     </div>
   );
   
