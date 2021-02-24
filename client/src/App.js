@@ -1,6 +1,10 @@
 import React from 'react';
 import {Switch, Route} from "react-router-dom";
-import GettingStarted from './pages/sign-up-flow/getting-started/Getting-Started';
+import ConfirmBIP39Phrase from './pages/sign-up-flow/confirm-bip39-phrase/Confirm-Bip39-Phrase';
+import CreateBIP39 from './pages/sign-up-flow/create-bip39-phrase/CreateBIP39';
+import GettingStarted from './pages/sign-up-flow/getting-started/Get-Password';
+import InitSocialRecovery from './pages/sign-up-flow/init-social-recovery/InitSocialRecovery';
+import OnboardingShell from './pages/sign-up-flow/onboarding-shell/onboarding-shell';
 
 // import pages
 import Welcome from './pages/sign-up-flow/welcome-page/Welcome';
@@ -15,7 +19,7 @@ function App(){
         <div className="App">
             <Switch>
                 {/* For current test purpsoes */}
-                <Route path="/" render={() => <GettingStarted/>}/>
+                <Route path="/setup" render={() => <OnboardingShell/>}/>
 
                 {/* Perform general onboarding  */}
                 {/* <Route path="/signup" render={() => <SignUpView/>}/> */}
