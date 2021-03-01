@@ -1,7 +1,8 @@
 const ShardManagerContract = artifacts.require("ShardManager");
 
+// @ts-ignore
 const { BN, expectEvent, expectRevert } = require('@openzeppelin/test-helpers');
-const { inTransaction } = require('@openzeppelin/test-helpers/src/expectEvent');
+// const { inTransaction } = require('@openzeppelin/test-helpers/src/expectEvent');
 const should = require("chai").should();
 const { expect } = require('chai');
 
@@ -41,8 +42,6 @@ contract("Shard Manager Contract", accounts => {
       const recoveryContractState = await deployedManager.checkRecoveryContractState(goverance);
       expect(recoveryContractState).to.be.a.bignumber.equal(new BN(0));
     });
-
-
   
   
   });

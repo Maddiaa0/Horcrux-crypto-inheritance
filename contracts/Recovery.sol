@@ -18,7 +18,7 @@ contract Recovery is Ownable {
     mapping(address => string) publicKeys;
     mapping(address => bool) pubKeyGathered;
     uint256 public currentChange; //The block number when a public key was verified, so that the transaction can be found
-    address[] trustees;
+    address[] public trustees;
     uint8 recoveryThreshold = 0;
 
     // The current recovery state of the contract
@@ -74,6 +74,14 @@ contract Recovery is Ownable {
         trustees.push(_toAdd);
     }
 
+    function batchAddShardholder(address[] calldata _toAdd) public onlyOwner {
+        // Set the provided addresses to be shard holders
+        for (uint8 i = 0; i < _toAdd.length; i++) {
+            shardHolders[_toAdd[i]] = true;
+            trustees.push(_toAdd[i]);
+        }
+    }
+
     function viewShardholder(address _view)
         public
         view
@@ -81,6 +89,10 @@ contract Recovery is Ownable {
         returns (bool)
     {
         return shardHolders[_view];
+    }
+
+    function getTrustees() public view returns (address[] memory) {
+        return trustees;
     }
 
     /**
@@ -93,8 +105,27 @@ contract Recovery is Ownable {
         blacklisted[_toBlacklist] = true;
     }
 
+    function batchBlacklistShardholder(address[] calldata _toBlacklist)
+        public
+        onlyOwner
+    {
+        // Set the provided addresses to be shard holders
+        for (uint8 i = 0; i < _toBlacklist.length; i++) {
+            blacklisted[_toBlacklist[i]] = true;
+        }
+    }
+
     function removeBlacklistShardholder(address _toBlacklist) public onlyOwner {
         blacklisted[_toBlacklist] = false;
+    }
+
+    function batchRemoveBlacklistShardholder(address[] calldata _toBlacklist)
+        public
+        onlyOwner
+    {
+        for (uint8 i = 0; i < _toBlacklist.length; i++) {
+            blacklisted[_toBlacklist[i]] = false;
+        }
     }
 
     function viewBlacklisted(address _view)

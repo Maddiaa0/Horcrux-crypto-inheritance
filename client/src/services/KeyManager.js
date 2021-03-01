@@ -1,7 +1,10 @@
 import { mont } from 'bn.js';
 import Crypto from 'crypto'
-import AES from 'crypto-js/aes';
+import CryptoJS from 'crypto-js';
 import local from '../config/local';
+
+// Services
+import CryptoManager from "./CryptoManager";
 
 
 /**
@@ -14,6 +17,7 @@ class KeyManager {
     constructor(){
         // State variables
         this.mnemonic = null;
+        this.currentKeys = null;
         this.privateKey = null;
         this.publicKey = null;
 
@@ -27,13 +31,31 @@ class KeyManager {
         this.comparePassAndHash = this.comparePassAndHash.bind(this);
     }
 
+    /**Generate and Store Mnemonic from password
+     * 
+     * Create a new BIP39 string and save it to the key manager state.
+     * Take the users password and store it and the mnemonic encrypted within storage.
+     * @param {String} password 
+     */
+    async generateAndStoreMnemonicFromPassword(password){
+        const mnemonic = CryptoManager.generateMnemomic()
+        this.mnemonic = mnemonic
+
+        this.setPasswordhash(password)
+        this.storeMnemonicInStorage(mnemonic, password)
+        const keys = await CryptoManager.getPublicPrivateKeyAtIndex(this.mnemonic, 1)
+        this.currentKeys = keys;
+        console.log(keys);
+        this.storeKeysInStorage(keys, password);
+    }
+
+
     /**
      * Request the variable stored as passhash from within the browser
      */
     async getPasswordHash() {
         return await JSON.parse(localStorage.getItem("passHash"));
     }
-
 
     setPasswordhash(password){
         let random = Math.floor(Math.random() * 15)
@@ -117,7 +139,7 @@ class KeyManager {
         }
 
         // first hash the mnemonic with the password
-        const encrypted = AES.encrypt(mnemonic, password);
+        const encrypted = CryptoJS.AES.encrypt(mnemonic, password);
         localStorage.setItem("mem", encrypted);
     }
 
@@ -136,13 +158,35 @@ class KeyManager {
         }
 
         const encryptedMem = localStorage.getItem("mem");
-        this.mnemonic = AES.decrypt(encryptedMem, password);
+        const bytes = CryptoJS.AES.decrypt(encryptedMem, password);
+        this.mnemonic = bytes.toString(CryptoJS.enc.Utf8);  
         return this.mnemonic;
     }
 
-    
+    storeKeysInStorage(keysObj, password){
+        if (password == null){
+            throw new Error("Password is required")
+        }
+        if (typeof password !== "string"){
+            throw new Error("password must be string")
+        }
+        const encryptedKey = CryptoJS.AES.encrypt(JSON.stringify(keysObj), password);
+        localStorage.setItem("currKeys", encryptedKey);
+    }
 
+    getKeysFromStorage(password){
+        if (password == null){
+            throw new Error("Password is required")
+        }
+        if (typeof password !== "string"){
+            throw new Error("password must be string")
+        }
 
+        const encryptedKey = localStorage.getItem("currKeys")
+        const bytes = CryptoJS.AES.decrypt(encryptedKey, password);
+        const keys = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));  
+        return keys;
+    }
 
 }
 

@@ -50,9 +50,9 @@ class IdentityManager {
 
         // this.getTestSideTree();
 
-
+        this.web3 = web3Service.web3;
         this.resolver = null;
-        console.log(this.sidetree);
+        this.currentUserDid = null;
     }
 
 
@@ -87,7 +87,11 @@ class IdentityManager {
         // let registry = "0xdca7ef03e98e0dc2b855be647c39abe984fcf21b";
         let address = ethAdress;
         let rpcUrl = "https://ropsten.infura.io/v3/bd43a2a9349a4c05af34e872b1872563";
-        const ethrDid = new EtherDID({provider, registry, address, privateKey})
+        const ethrDid = new EtherDID({provider, registry, address, privateKey});
+        
+        // set the did to the service state
+        this.currentUserDid = etherDid;
+
         return ethrDid;
     }
 

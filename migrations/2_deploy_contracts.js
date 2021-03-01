@@ -4,7 +4,7 @@ var ShardManagerContract = artifacts.require("ShardManager");
 var RecoveryContract = artifacts.require("Recovery");
 
 
-module.exports = async function(deployer) {
+module.exports = async (deployer, network, accounts) =>  {
   // get addresses 
   const addresses = await web3.eth.getAccounts();
   const [goverance, notGovernance, bob, alice] = addresses;
@@ -17,4 +17,11 @@ module.exports = async function(deployer) {
   const thresholdAmount = new BN(3);
   // let recoveryContract = await RecoveryContract.new(ShardManagerContract.address, goverance, thresholdAmount, { from: goverance});
   await deployer.deploy(RecoveryContract, ShardManagerContract.address, goverance, thresholdAmount);
+
+  // const metaDataFile = `${__dirname}/../client/contracts/ShardManager.json`
+  // console.log(metaDataFile);
+  // const metaData = require(metaDataFile)
+  // metaData.networks[deployer.network_id] = {}
+  // metaData.networks[deployer.network_id].address = ShardManagerContract.address
+  // fs.writeFileSync(metaDataFile, JSON.stringify(metaData, null, 4))
 };

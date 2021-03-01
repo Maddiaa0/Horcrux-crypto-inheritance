@@ -21,7 +21,7 @@ contract ShardManager {
 
     // Event to store if recovery contracts have been created etc.
     event ShardRecoveryStep(
-        address indexed _ownerAddress,
+        address indexed ownerAddress,
         address contractAddress,
         uint256 step
     );

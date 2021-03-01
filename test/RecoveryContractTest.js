@@ -59,6 +59,33 @@ contract("Recovery Contract", accounts => {
     it("Should not allow non-owner to view trustees", async function(){
         await expectRevert(deployedRecovery.viewShardholder(notGovernance, {from: accountAlice}), "Ownable: caller is not the owner");
     });
+
+    describe("Addition and access to batch added trustees", async function (){
+
+      it("Should allow addition of trustees in a batch upload", async function(){
+        const result = await deployedRecovery.batchAddShardholder([accountBob, accountAlice], {from: goverance});
+        
+        // check both accounts are shardholders
+        const isBob = await deployedRecovery.viewShardholder(accountBob, {from:goverance});
+        const isAlice = await deployedRecovery.viewShardholder(accountAlice, {from: goverance});
+
+        expect(isBob).to.be.equal(true);
+        expect(isAlice).to.be.equal(true);
+      });
+
+      it("Should not allow non-owner accounts to batch add trustees", async function(){
+        await expectRevert(deployedRecovery.batchAddShardholder([accountAlice], {from:notGovernance}), "Ownable: caller is not the owner");
+      });
+
+    });
+
+    describe("Allow for the download of the array of trustees", async function(){
+      it("Should read array of trustees", async function(){
+        const result = await deployedRecovery.getTrustees({from: goverance});
+        expect(result).to.be.equal([notGovernance, notGovernance, accountBob, accountAlice]);
+      })
+    });
+
   });
 
   describe("Addition and Access to blacklist", async () => {
@@ -79,6 +106,30 @@ contract("Recovery Contract", accounts => {
         const isBlacklisted = await deployedRecovery.viewBlacklisted(notGovernance, {from:goverance});
 
         expect(isBlacklisted).to.equal(false);
+    });
+
+    describe("Batch Blacklist Operations", async function(){
+      
+      it("Should perform batch additions", async function(){
+          const result = await deployedRecovery.batchBlacklistShardholder([accountAlice, accountBob], {from: goverance});
+        
+        const isAliceBlacklisted = await deployedRecovery.viewBlacklisted(accountAlice, {from: goverance});
+        const isBobBlacklisted = await deployedRecovery.viewBlacklisted(accountBob, {from: goverance});
+
+        expect(isAliceBlacklisted).to.be.equal(true);
+        expect(isBobBlacklisted).to.be.equal(true);
+      });
+
+      it("Should allow batch removals from the blacklist", async function(){
+        const result = await deployedRecovery.batchRemoveBlacklistShardholder([accountAlice, accountBob], {from: goverance});
+        
+        const isAliceBlacklisted = await deployedRecovery.viewBlacklisted(accountAlice, {from: goverance});
+        const isBobBlacklisted = await deployedRecovery.viewBlacklisted(accountBob, {from: goverance});
+
+        expect(isAliceBlacklisted).to.be.equal(false);
+        expect(isBobBlacklisted).to.be.equal(false);
+      })
+
     })
   });
 
