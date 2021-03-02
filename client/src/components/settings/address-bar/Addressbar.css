@@ -1,0 +1,9 @@
+.AddressBar {
+  border-radius: 5px;
+  /* background-color: white; */
+  padding: 0.2rem;
+}
+
+.AddressBar-selected {
+  background-color: lightgreen;
+}

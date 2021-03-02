@@ -35,6 +35,12 @@ contract Recovery is Ownable {
         uint256 previousChange
     );
 
+    event TrusteeAdded(
+        address indexed account,
+        address owner,
+        uint256 previousChange
+    );
+
     /**
      *
      */
@@ -72,6 +78,10 @@ contract Recovery is Ownable {
         // Set the provided address as a shard holder
         shardHolders[_toAdd] = true;
         trustees.push(_toAdd);
+
+        // emit an event confirming that the requested trustee has been added
+        emit TrusteeAdded(_toAdd, this.owner(), currentChange);
+        currentChange = block.number;
     }
 
     function batchAddShardholder(address[] calldata _toAdd) public onlyOwner {
@@ -80,15 +90,6 @@ contract Recovery is Ownable {
             shardHolders[_toAdd[i]] = true;
             trustees.push(_toAdd[i]);
         }
-    }
-
-    function viewShardholder(address _view)
-        public
-        view
-        onlyOwner
-        returns (bool)
-    {
-        return shardHolders[_view];
     }
 
     function getTrustees() public view returns (address[] memory) {

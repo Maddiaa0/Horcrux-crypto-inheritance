@@ -14,6 +14,7 @@ contract("Recovery Contract", accounts => {
   const notGovernance = accounts[1];
   const accountAlice = accounts[2];
   const accountBob = accounts[3];
+  const accountSideshowBob = accounts[4];
 
   let deployedRecovery, amount, logs
 
@@ -28,7 +29,7 @@ contract("Recovery Contract", accounts => {
     it("Should allow the addition of trustees", async function(){
       
       const result = await deployedRecovery.addShardholder(notGovernance, {from: goverance});  
-      const isShardHolder = await deployedRecovery.viewShardholder(notGovernance, {from: goverance});
+      const isShardHolder = await deployedRecovery.shardHolders.call(notGovernance, {from: goverance});
     
       expect(isShardHolder).to.be.equal(true);
     });  
@@ -47,7 +48,7 @@ contract("Recovery Contract", accounts => {
     it("Should allow the addition of trustees", async function(){
       
       const result = await deployedRecovery.addShardholder(notGovernance, {from: goverance});  
-      const isShardHolder = await deployedRecovery.viewShardholder(notGovernance, {from: goverance});
+      const isShardHolder = await deployedRecovery.shardHolders.call(notGovernance, {from: goverance});
     
       expect(isShardHolder).to.be.equal(true);
     });  
@@ -56,18 +57,14 @@ contract("Recovery Contract", accounts => {
         await expectRevert(deployedRecovery.addShardholder(accountAlice, {from:notGovernance}), "Ownable: caller is not the owner");
     });
 
-    it("Should not allow non-owner to view trustees", async function(){
-        await expectRevert(deployedRecovery.viewShardholder(notGovernance, {from: accountAlice}), "Ownable: caller is not the owner");
-    });
-
     describe("Addition and access to batch added trustees", async function (){
 
       it("Should allow addition of trustees in a batch upload", async function(){
         const result = await deployedRecovery.batchAddShardholder([accountBob, accountAlice], {from: goverance});
         
         // check both accounts are shardholders
-        const isBob = await deployedRecovery.viewShardholder(accountBob, {from:goverance});
-        const isAlice = await deployedRecovery.viewShardholder(accountAlice, {from: goverance});
+        const isBob = await deployedRecovery.shardHolders.call(accountBob, {from:goverance});
+        const isAlice = await deployedRecovery.shardHolders.call(accountAlice, {from: goverance});
 
         expect(isBob).to.be.equal(true);
         expect(isAlice).to.be.equal(true);
@@ -134,6 +131,31 @@ contract("Recovery Contract", accounts => {
   });
 
 
+  describe("Trustee can verify they wish to partake in the sharing scheme", async function(){
+
+    it("User who has been added to shortlist should be able to call verify", async function(){
+        const result = await deployedRecovery.addShardholder(notGovernance, {from: goverance});
+        const isShardholder = await deployedRecovery.shardHolders.call(notGovernance, {from: goverance});
+
+        expect(isShardholder).to.equal(true);
+        // notGovernance should be able to call verify method
+        const verifyResult = await deployedRecovery.confirmTrustee({from: notGovernance});
+        const confirmed = await deployedRecovery.confirmed(notGovernance, {from: goverance});
+
+        expect(confirmed).to.be.equal(true);
+    });
+
+    it("User who has NOT BEEN added to shortlist should not be able to call verify", async function(){
+        // notGovernance should be able to call verify method
+        await expectRevert(deployedRecovery.confirmTrustee({from: accountSideshowBob}), "Sender is not a trustee");
+
+        const confimed = await deployedRecovery.confirmed.call(accountBob, {from:goverance});
+        expect(confimed).to.be.equal(false);
+    })
+
+  });
+
+
 
   describe("Triggering the Recovery Event", async () => {
 
@@ -156,7 +178,7 @@ contract("Recovery Contract", accounts => {
       it("Sends a recovery NFT to the trustees addresses", async function(){
         // add alice as a shardholder
         const result = await deployedRecovery.addShardholder(accountAlice, {from: goverance});
-        const isShardHolder = await deployedRecovery.viewShardholder(accountAlice, {from: goverance});
+        const isShardHolder = await deployedRecovery.shardHolders.call(accountAlice, {from: goverance});
         expect(isShardHolder).to.be.equal(true);
 
         // Make alice send out a recovery event with a particular payload
@@ -176,7 +198,7 @@ contract("Recovery Contract", accounts => {
       it("Sets the address initiating recovery to be that who initialised recovery", async function(){
         // add alice as a shardholder
         const result = await deployedRecovery.addShardholder(accountAlice, {from: goverance});
-        const isShardHolder = await deployedRecovery.viewShardholder(accountAlice, {from: goverance});
+        const isShardHolder = await deployedRecovery.shardHolders.call(accountAlice, {from: goverance});
         expect(isShardHolder).to.be.equal(true);
 
         // Make alice send out a recovery event with a particular payload
@@ -203,7 +225,7 @@ contract("Recovery Contract", accounts => {
     it("Does not allow untrusteed user to send their own recovery NFT", async function(){
         // add alice as a shardholder
         const result = await deployedRecovery.addShardholder(accountAlice, {from: goverance});
-        const isShardHolder = await deployedRecovery.viewShardholder(accountAlice, {from: goverance});
+        const isShardHolder = await deployedRecovery.shardHolders.call(accountAlice, {from: goverance});
         expect(isShardHolder).to.be.equal(true);
 
         // Make alice send out recovery
@@ -217,8 +239,8 @@ contract("Recovery Contract", accounts => {
         // add alice and bob as shardholders
         await deployedRecovery.addShardholder(accountAlice, {from: goverance});
         await deployedRecovery.addShardholder(accountBob, {from: goverance});
-        const isAliceShardHolder = await deployedRecovery.viewShardholder(accountAlice, {from: goverance});
-        const isBobShardHolder = await deployedRecovery.viewShardholder(accountBob, {from:goverance});
+        const isAliceShardHolder = await deployedRecovery.shardHolders.call(accountAlice, {from: goverance});
+        const isBobShardHolder = await deployedRecovery.shardHolders.call(accountBob, {from:goverance});
         expect(isAliceShardHolder).to.be.equal(true);
         expect(isBobShardHolder).to.be.equal(true);
 

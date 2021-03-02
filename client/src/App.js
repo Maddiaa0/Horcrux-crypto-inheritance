@@ -12,6 +12,7 @@ import getWeb3 from './getWeb3';
 import Welcome from './pages/sign-up-flow/welcome-page/Welcome';
 import recoveryContractManager from './services/RecoveryContractManager';
 import web3Service from './services/Web3Service';
+import VerifyPage from './pages/verify-page/VerifyPage';
 
 /**
  * App
@@ -34,6 +35,9 @@ function App(){
 
                 {/* For the settings tab*/}
                 <Route path="/settings" render={() => <SettingsShell/>}/>
+
+                {/* For when a user wishes to verify themselves as a trustee */}
+                <Route path="/verify" render={() => <VerifyPage/>}/>
 
                 {/* Perform general onboarding  */}
                 {/* <Route path="/signup" render={() => <SignUpView/>}/> */}

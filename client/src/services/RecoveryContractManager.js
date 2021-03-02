@@ -19,6 +19,7 @@ class RecoveryContractManager{
         this.masterRecoveryContract = null;
         this.nftContractAddress = null;
         this.recoveryContract = null;
+        this.inVerify = false;
 
         this.initWeb3Provider();
     }
@@ -260,19 +261,60 @@ class RecoveryContractManager{
             console.log("Shardholders - " + res);
         });
 
+        // check if the provided addresses are confirmed
+        var shardHoldersObject = [];
+        for (let i =0; i< shardHoldersResult.length; i++){
+            const isVerified = await this.recoveryContract.methods.confirmed(shardHoldersResult[i]).call({from: this.web3.currentProvider.selectedAddress});
+            console.log(isVerified);
+            shardHoldersObject.push({
+                address: shardHoldersResult[i],
+                verified: isVerified
+            });
+        }
+        console.log("SHARD HOLDERS OBJECT");
+        console.log(shardHoldersObject);
+
         var shardholder = [], blacklisted = [];
         // split the shardholders into active shardholders and those that are currently blacklisted
-        for (let i=0; i< shardHoldersResult.length; i++){
-            if (await this.recoveryContract.methods.blacklisted(shardHoldersResult[i]).call({from: this.web3.currentProvider.selectedAddress})){
-                blacklisted.push(shardHoldersResult[i]);
-            }else if (await this.recoveryContract.methods.shardHolders(shardHoldersResult[i]).call({from: this.web3.currentProvider.selectedAddress})){
-                shardholder.push(shardHoldersResult[i]);
+        for (let i=0; i< shardHoldersObject.length; i++){
+            if (await this.recoveryContract.methods.blacklisted(shardHoldersObject[i].address).call({from: this.web3.currentProvider.selectedAddress})){
+                blacklisted.push(shardHoldersObject[i]);
+            }else if (await this.recoveryContract.methods.shardHolders(shardHoldersObject[i].address).call({from: this.web3.currentProvider.selectedAddress})){
+                shardholder.push(shardHoldersObject[i]);
             }
         }
         return {
             shardholder,
             blacklisted
         };
+    }
+
+    //-------------------------------------------------------------------------------------------------------------------------------------
+    // For when performing verifications from another eth address
+    //-------------------------------------------------------------------------------------------------------------------------------------
+    async verifyRecoveryContractFromAddress(address){
+        this.inVerify = true;
+        await this.getRecoveryContractForAddress(address);
+        this.recoveryContract.methods.confirmTrustee().send({from: this.web3.currentProvider.selectedAddress}, function(err, res){
+            if (err){
+                console.log("Verifying trustee failed");
+                return;
+            }
+            console.log("Trustee Verified - Hash " + res);
+        });
+    }
+
+    async isUserATrustee(address){
+        this.inVerify = true;
+        await this.getRecoveryContractForAddress(address);
+        const isTrustee = await this.recoveryContract.methods.shardHolders(this.web3.currentProvider.selectedAddress).call({from: this.web3.currentProvider.selectedAddress}, function(err, res){
+            if (err){
+                console.log("Verifying trustee failed");
+                return;
+            }
+            console.log("Trustee Verified " + res);
+        });
+        return isTrustee;
     }
 }
 

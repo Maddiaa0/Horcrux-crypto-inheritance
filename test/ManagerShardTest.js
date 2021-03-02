@@ -27,7 +27,7 @@ contract("Shard Manager Contract", accounts => {
       const _threshold = 3;
       const result = await deployedManager.createRecoveryContract(goverance, _threshold, {from: goverance});
       const userRecoveryAddress = result.logs[0].args.contractAddress;
-      const userOwnerAddress = result.logs[0].args._ownerAddress;
+      const userOwnerAddress = result.logs[0].args.ownerAddress;
       const userRecoveryContractState = result.logs[0].args.step;
 
       expect(userRecoveryAddress).to.not.be.equal(null);

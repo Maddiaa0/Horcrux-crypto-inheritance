@@ -8,7 +8,7 @@ import {ValidatorForm, TextValidator} from "react-material-ui-form-validator";
 import Row from "../Row";
 import Column from "../Column";
 import SignUpParagraph from "../sign-up/SignUpParagraph";
-import {Button} from "@material-ui/core";
+import {Button, Card, Tooltip} from "@material-ui/core";
 
 // constants
 import {ethValidatorMessages} from "../../helpers/constants/error-messages";
@@ -60,64 +60,74 @@ function AddShardholders(){
     }
 
     return (
-        <ValidatorForm onSubmit={addSelectedShardholders}>
-            <div className="ethaddress-container">
-                
-                {shareHolders.map((shareholder, index) => (
-                    <div 
-                        className="shareHolder"
-                    >
-                        <Row>
-                            <TextValidator
-                                key={`shareholderInput-${index}`}            
-                                type="text"
-                                variant="outlined"
-                                placeholder={`Eth Address #${index + 1}`}
-                                value={shareholder.address}
-                                onChange={handleShareHolderNameChange(index)} 
-                                validators={ethValidatorMessages.isEthAddress}
-                                errorMessages={ethValidatorMessages.isEthErrorMessage}
-                            />
-                            <Button
-                                key={`remove-shareholder-${index}`}
-                                variant="contained"
-                                type="button"
-                                onClick={handleRemoveShareholder(index)}
-                            >
-                                x
-                            </Button>
-                        </Row>
+        <Card variant="outlined" style={{
+            padding: "2rem"
+        }}>
+            <ValidatorForm onSubmit={addSelectedShardholders}>
+                <div className="ethaddress-container">
+                    
+                    {shareHolders.map((shareholder, index) => (
+                        <div 
+                            className="shareHolder"
+                        >
+                            <Row>
+                                <TextValidator
+                                    key={`shareholderInput-${index}`}            
+                                    type="text"
+                                    variant="outlined"
+                                    placeholder={`Eth Address #${index + 1}`}
+                                    value={shareholder.address}
+                                    onChange={handleShareHolderNameChange(index)} 
+                                    validators={ethValidatorMessages.isEthAddress}
+                                    errorMessages={ethValidatorMessages.isEthErrorMessage}
+                                />
+                                <Tooltip 
+                                    title="Remove address entry box"
+                                    placement="top"
+                                    arrow
+                                >    
+                                    <Button
+                                        key={`remove-shareholder-${index}`}
+                                        variant="contained"
+                                        type="button"
+                                        onClick={handleRemoveShareholder(index)}
+                                    >
+                                        x
+                                    </Button>
+                                </Tooltip>
+                            </Row>
+                        </div>
+                        )
+                    )}
+                </div>
+
+                <SignUpParagraph>
+                    Your trustees are required to send a registration transaction to an address that will be shown to you shortly.
+                    <br></br>
+                    If they can not register using this address then they will not be able to initiate recovery.
+                    <br></br>
+                    Instructions to initialise recovery will be provided soon.
+                </SignUpParagraph>
+                    
+
+                <div className="ethaddress-button-row">
+                    <div className="ethaddress-button">
+                        <Button  type="button" variant="contained" onClick={handleAddShareHolder}>
+                            Add Shareholder
+                        </Button>
                     </div>
-                    )
-                )}
-            </div>
-
-            <SignUpParagraph>
-                Your trustees are required to send a registration transaction to an address that will be shown to you shortly.
-                <br></br>
-                If they can not register using this address then they will not be able to initiate recovery.
-                <br></br>
-                Instructions to initialise recovery will be provided soon.
-            </SignUpParagraph>
-                
-
-            <div className="ethaddress-button-row">
-                <div className="ethaddress-button">
-                    <Button  type="button" variant="contained" onClick={handleAddShareHolder}>
-                        Add Shareholder
-                    </Button>
+                    <div className="ethaddress-button">
+                        <Button 
+                            className="ethaddress-button" 
+                            type="submit" 
+                            variant="contained"
+                        >
+                            Continue
+                        </Button>
+                    </div>
                 </div>
-                <div className="ethaddress-button">
-                    <Button 
-                        className="ethaddress-button" 
-                        type="submit" 
-                        variant="contained"
-                    >
-                        Continue
-                    </Button>
-                </div>
-            </div>
-        </ValidatorForm>
+            </ValidatorForm>
+        </Card>
     );
 }
 
