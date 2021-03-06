@@ -184,7 +184,9 @@ class KeyManager {
 
         const encryptedKey = localStorage.getItem("currKeys")
         const bytes = CryptoJS.AES.decrypt(encryptedKey, password);
-        const keys = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));  
+        const keys = JSON.parse(bytes.toString(CryptoJS.enc.Utf8)); 
+        this.privateKey = keys.privKey;
+        this.publicKey = keys.pubKey; 
         return keys;
     }
 

@@ -1,22 +1,21 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.7.4;
 
-import "./ShardManager.sol";
+import "./IShardManager.sol";
 import "./ShardNFT.sol";
+import "./IShardNFT.sol";
+
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Recovery is Ownable {
     enum RecoveryState {Created, Normal, InRecovery, Death}
 
-    // This contract should be an NFT that is sent to each of the users, containing
-    // their encoded shard information
-
     // a user can revoke a particular shard holder from being user by storing by blacklisting them here
     mapping(address => bool) public shardHolders;
     mapping(address => bool) public blacklisted;
     mapping(address => bool) public confirmed; // trustees can send a transaction from their own account to the contract so that they can show up as confirmed
-    mapping(address => string) publicKeys;
-    mapping(address => bool) pubKeyGathered;
+    // mapping(address => string) publicKeys;
+    // mapping(address => bool) pubKeyGathered;
     uint256 public currentChange; //The block number when a public key was verified, so that the transaction can be found
     address[] public trustees;
     uint8 recoveryThreshold = 0;
@@ -26,7 +25,7 @@ contract Recovery is Ownable {
     RecoveryState recoveryState;
     // Will be set if a trustee has triggered recovery
     address trusteeTriggeredRecovery;
-    ShardManager parentContract;
+    IShardManager parentContract;
     ShardNFT nftContract;
 
     event TrusteeVerified(
@@ -45,12 +44,12 @@ contract Recovery is Ownable {
      *
      */
     constructor(
-        ShardManager _parentContract,
+        address _parentContract,
         address _owner,
         uint8 _recoveryThreshold
     ) {
-        parentContract = _parentContract;
-        nftContract = new ShardNFT(this, _owner);
+        parentContract = IShardManager(_parentContract);
+        nftContract = new ShardNFT();
         transferOwnership(_owner);
         recoveryThreshold = _recoveryThreshold;
     }
@@ -74,36 +73,12 @@ contract Recovery is Ownable {
         of ethereum addresses that will then be marked and stored.
         Only the owner can perform this operation
     */
-    function addShardholder(address _toAdd) public onlyOwner {
-        // Set the provided address as a shard holder
-        shardHolders[_toAdd] = true;
-        trustees.push(_toAdd);
-
-        // emit an event confirming that the requested trustee has been added
-        emit TrusteeAdded(_toAdd, this.owner(), currentChange);
-        currentChange = block.number;
-    }
-
     function batchAddShardholder(address[] calldata _toAdd) public onlyOwner {
         // Set the provided addresses to be shard holders
         for (uint8 i = 0; i < _toAdd.length; i++) {
             shardHolders[_toAdd[i]] = true;
             trustees.push(_toAdd[i]);
         }
-    }
-
-    function getTrustees() public view returns (address[] memory) {
-        return trustees;
-    }
-
-    /**
-     * Blacklist Shard Holder
-     *
-     * The provided address can will be marked as void by the shard holder
-     * Only the owner can provide this operation
-     */
-    function blackListShardholder(address _toBlacklist) public onlyOwner {
-        blacklisted[_toBlacklist] = true;
     }
 
     function batchBlacklistShardholder(address[] calldata _toBlacklist)
@@ -116,10 +91,6 @@ contract Recovery is Ownable {
         }
     }
 
-    function removeBlacklistShardholder(address _toBlacklist) public onlyOwner {
-        blacklisted[_toBlacklist] = false;
-    }
-
     function batchRemoveBlacklistShardholder(address[] calldata _toBlacklist)
         public
         onlyOwner
@@ -127,15 +98,6 @@ contract Recovery is Ownable {
         for (uint8 i = 0; i < _toBlacklist.length; i++) {
             blacklisted[_toBlacklist[i]] = false;
         }
-    }
-
-    function viewBlacklisted(address _view)
-        public
-        view
-        onlyOwner
-        returns (bool)
-    {
-        return blacklisted[_view];
     }
 
     /** Confirm Trustee
@@ -149,9 +111,11 @@ contract Recovery is Ownable {
 
     function sendShardToShardOwner(address _shardOwner, string memory _shardURI)
         public
+        onlyOwner
     {
         // check that the shard holder it is being sent to is registered
         require(shardHolders[_shardOwner], "Not a valid Trustee");
+        nftContract.distributeShard(_shardOwner, _shardURI);
     }
 
     /**
@@ -167,8 +131,6 @@ contract Recovery is Ownable {
         );
         trusteeTriggeredRecovery = msg.sender;
         // mark the parent contract's state to have been updated
-        address _owner = this.owner();
-
         //TODO: un-comment this line
         // parentContract.updateRecoveryState(
         //     _owner,
@@ -202,4 +164,15 @@ contract Recovery is Ownable {
      * Destroy Shard contract
      */
     function destroyShardContract() public onlyOwner {}
+
+    function transferRecoveryOwnership(address _newOwner, address _currentOwner)
+        public
+        onlyOwner
+    {
+        parentContract.setNewContractOwner(
+            _newOwner,
+            this.owner(),
+            address(this)
+        );
+    }
 }

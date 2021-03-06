@@ -15,6 +15,7 @@ contract("Recovery Contract", accounts => {
   const accountAlice = accounts[2];
   const accountBob = accounts[3];
   const accountSideshowBob = accounts[4];
+  const accountNewOwner = accounts[5];
 
   let deployedRecovery, amount, logs
 
@@ -28,7 +29,7 @@ contract("Recovery Contract", accounts => {
     
     it("Should allow the addition of trustees", async function(){
       
-      const result = await deployedRecovery.addShardholder(notGovernance, {from: goverance});  
+      const result = await deployedRecovery.batchAddShardholder([notGovernance], {from: goverance});  
       const isShardHolder = await deployedRecovery.shardHolders.call(notGovernance, {from: goverance});
     
       expect(isShardHolder).to.be.equal(true);
@@ -47,14 +48,14 @@ contract("Recovery Contract", accounts => {
     
     it("Should allow the addition of trustees", async function(){
       
-      const result = await deployedRecovery.addShardholder(notGovernance, {from: goverance});  
+      const result = await deployedRecovery.batchAddShardholder([notGovernance], {from: goverance});  
       const isShardHolder = await deployedRecovery.shardHolders.call(notGovernance, {from: goverance});
     
       expect(isShardHolder).to.be.equal(true);
     });  
 
     it("Should not allow non-owner accounts to add trustee", async function(){
-        await expectRevert(deployedRecovery.addShardholder(accountAlice, {from:notGovernance}), "Ownable: caller is not the owner");
+        await expectRevert(deployedRecovery.batchAddShardholder([accountAlice], {from:notGovernance}), "Ownable: caller is not the owner");
     });
 
     describe("Addition and access to batch added trustees", async function (){
@@ -78,7 +79,7 @@ contract("Recovery Contract", accounts => {
 
     describe("Allow for the download of the array of trustees", async function(){
       it("Should read array of trustees", async function(){
-        const result = await deployedRecovery.getTrustees({from: goverance});
+        const result = await deployedRecovery.trustees.call();
         expect(result).to.be.equal([notGovernance, notGovernance, accountBob, accountAlice]);
       })
     });
@@ -87,20 +88,19 @@ contract("Recovery Contract", accounts => {
 
   describe("Addition and Access to blacklist", async () => {
     it("Blacklists a trustee correctly", async function(){
-        const result = await deployedRecovery.blackListShardholder(notGovernance, {from: goverance});
-        const isBlackListed = await deployedRecovery.viewBlacklisted(notGovernance, {from: goverance});
+        const result = await deployedRecovery.batchBlacklistShardholder([notGovernance], {from: goverance});
+        const isBlackListed = await deployedRecovery.blacklisted.call(notGovernance, {from: goverance});
 
         expect(isBlackListed).to.equal(true);
     });
 
-    it("Should not allow non-owner accounts to view or add blacklist", async function(){
-        await expectRevert(deployedRecovery.blackListShardholder(accountAlice, {from:notGovernance}), "Ownable: caller is not the owner");
-        await expectRevert(deployedRecovery.viewBlacklisted(accountAlice, {from:notGovernance}), "Ownable: caller is not the owner");
+    it("Should not allow non-owner accounts to add to blacklist", async function(){
+        await expectRevert(deployedRecovery.batchBlacklistShardholder([accountAlice], {from:notGovernance}), "Ownable: caller is not the owner");
     });
 
     it("Should remove a user from the blacklist", async function(){
-        const result = await deployedRecovery.removeBlacklistShardholder(notGovernance, {from:goverance});
-        const isBlacklisted = await deployedRecovery.viewBlacklisted(notGovernance, {from:goverance});
+        const result = await deployedRecovery.batchRemoveBlacklistShardholder([notGovernance], {from:goverance});
+        const isBlacklisted = await deployedRecovery.blacklisted.call(notGovernance, {from:goverance});
 
         expect(isBlacklisted).to.equal(false);
     });
@@ -110,8 +110,8 @@ contract("Recovery Contract", accounts => {
       it("Should perform batch additions", async function(){
           const result = await deployedRecovery.batchBlacklistShardholder([accountAlice, accountBob], {from: goverance});
         
-        const isAliceBlacklisted = await deployedRecovery.viewBlacklisted(accountAlice, {from: goverance});
-        const isBobBlacklisted = await deployedRecovery.viewBlacklisted(accountBob, {from: goverance});
+        const isAliceBlacklisted = await deployedRecovery.blacklisted.call(accountAlice, {from: goverance});
+        const isBobBlacklisted = await deployedRecovery.blacklisted.call(accountBob, {from: goverance});
 
         expect(isAliceBlacklisted).to.be.equal(true);
         expect(isBobBlacklisted).to.be.equal(true);
@@ -120,8 +120,8 @@ contract("Recovery Contract", accounts => {
       it("Should allow batch removals from the blacklist", async function(){
         const result = await deployedRecovery.batchRemoveBlacklistShardholder([accountAlice, accountBob], {from: goverance});
         
-        const isAliceBlacklisted = await deployedRecovery.viewBlacklisted(accountAlice, {from: goverance});
-        const isBobBlacklisted = await deployedRecovery.viewBlacklisted(accountBob, {from: goverance});
+        const isAliceBlacklisted = await deployedRecovery.blacklisted.call(accountAlice, {from: goverance});
+        const isBobBlacklisted = await deployedRecovery.blacklisted.call(accountBob, {from: goverance});
 
         expect(isAliceBlacklisted).to.be.equal(false);
         expect(isBobBlacklisted).to.be.equal(false);
@@ -134,7 +134,7 @@ contract("Recovery Contract", accounts => {
   describe("Trustee can verify they wish to partake in the sharing scheme", async function(){
 
     it("User who has been added to shortlist should be able to call verify", async function(){
-        const result = await deployedRecovery.addShardholder(notGovernance, {from: goverance});
+        const result = await deployedRecovery.batchAddShardholder([notGovernance], {from: goverance});
         const isShardholder = await deployedRecovery.shardHolders.call(notGovernance, {from: goverance});
 
         expect(isShardholder).to.equal(true);
@@ -177,7 +177,7 @@ contract("Recovery Contract", accounts => {
 
       it("Sends a recovery NFT to the trustees addresses", async function(){
         // add alice as a shardholder
-        const result = await deployedRecovery.addShardholder(accountAlice, {from: goverance});
+        const result = await deployedRecovery.batchAddShardholder([accountAlice], {from: goverance});
         const isShardHolder = await deployedRecovery.shardHolders.call(accountAlice, {from: goverance});
         expect(isShardHolder).to.be.equal(true);
 
@@ -197,7 +197,7 @@ contract("Recovery Contract", accounts => {
 
       it("Sets the address initiating recovery to be that who initialised recovery", async function(){
         // add alice as a shardholder
-        const result = await deployedRecovery.addShardholder(accountAlice, {from: goverance});
+        const result = await deployedRecovery.batchAddShardholder([accountAlice], {from: goverance});
         const isShardHolder = await deployedRecovery.shardHolders.call(accountAlice, {from: goverance});
         expect(isShardHolder).to.be.equal(true);
 
@@ -224,7 +224,7 @@ contract("Recovery Contract", accounts => {
 
     it("Does not allow untrusteed user to send their own recovery NFT", async function(){
         // add alice as a shardholder
-        const result = await deployedRecovery.addShardholder(accountAlice, {from: goverance});
+        const result = await deployedRecovery.batchAddShardholder([accountAlice], {from: goverance});
         const isShardHolder = await deployedRecovery.shardHolders.call(accountAlice, {from: goverance});
         expect(isShardHolder).to.be.equal(true);
 
@@ -237,8 +237,8 @@ contract("Recovery Contract", accounts => {
 
     it("Successfully allows trusted user to send recovery NFT", async function(){
         // add alice and bob as shardholders
-        await deployedRecovery.addShardholder(accountAlice, {from: goverance});
-        await deployedRecovery.addShardholder(accountBob, {from: goverance});
+        await deployedRecovery.batchAddShardholder([accountAlice], {from: goverance});
+        await deployedRecovery.batchAddShardholder([accountBob], {from: goverance});
         const isAliceShardHolder = await deployedRecovery.shardHolders.call(accountAlice, {from: goverance});
         const isBobShardHolder = await deployedRecovery.shardHolders.call(accountBob, {from:goverance});
         expect(isAliceShardHolder).to.be.equal(true);
@@ -269,6 +269,42 @@ contract("Recovery Contract", accounts => {
     });
 
   });
+
+  // Key cycling shall be allowed with BIP32, the idea of this method is that changing the owner using ownable will be possible
+  describe("Recovery Contract can change owner", async function(){
+    it("Successfully transfers of ownership to a new address", async function(){
+      const result = await deployedRecovery.transferOwnership(accountNewOwner, {from: goverance});
+      const owner = await deployedRecovery.owner({from: accountNewOwner});
+
+      expect(owner).to.be.equal(accountNewOwner);
+    });
+
+    it("An account that is not the owner cannot transfer ownership", async function(){
+      await expectRevert(
+        deployedRecovery.transferOwnership(accountAlice, { from: accountAlice }),
+        'Ownable: caller is not the owner',
+      );
+    });
+
+    it("New owner can perform ownable tasks", async function(){
+      const result = await deployedRecovery.getNFTAddress({from: accountNewOwner});
+      expect(result).to.not.be.equal(null); 
+    });
+
+    it("Old owner is unable to perform ownable tasks", async function(){
+      await expectRevert(
+        deployedRecovery.getNFTAddress({ from: goverance }),
+        'Ownable: caller is not the owner',
+      );
+    });
+
+    it("Ownership can be transfered back to the old owner", async function(){
+      const result = await deployedRecovery.transferOwnership(goverance, {from: accountNewOwner});
+      const owner = await deployedRecovery.owner({from: goverance});
+
+      expect(owner).to.be.equal(goverance);
+    });
+  })
 
 
 

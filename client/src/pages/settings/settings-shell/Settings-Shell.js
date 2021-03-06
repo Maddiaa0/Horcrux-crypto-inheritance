@@ -5,6 +5,7 @@ import SectionHeader from "../../../components/typography/SectionHeader";
 // pages
 import EditShardholders from "../edit-share-holders/edit-share-holders";
 import SettingsMenu from "../settings-menu/Settings-Menu";
+import CycleKeys from "../cycle-keys/CycleKeys";
 
 // components
 import SettingsMenuCard from "../../../components/settings/settings-menu-card/SettingsMenuCard";
@@ -12,7 +13,16 @@ import SettingsMenuCard from "../../../components/settings/settings-menu-card/Se
 // style
 import "./settings-shell.css";
 
+
 function SettingsShell(){
+    const history = useHistory();
+
+    const manageShardholdersClicked = () => {
+        history.push("/settings/edit-shardholders");
+    }
+    const manageIdentityClidked = () => {
+        history.push("/settings/keys");
+    }
 
     return (
         <div className="settings-shell">
@@ -30,8 +40,16 @@ function SettingsShell(){
                 <SectionHeader>
                     Settings
                 </SectionHeader>
-                <SettingsMenuCard title="Manage Shardholders" subtitle="Edit blacklist and add new shardholders"/>
-                <SettingsMenuCard title="Manage Identities" subtitle="Cycle keys to a new identity"/>
+                <SettingsMenuCard 
+                    onClick={manageShardholdersClicked}
+                    title="Manage Shardholders" 
+                    subtitle="Edit blacklist and add new shardholders"
+                />
+                <SettingsMenuCard 
+                    onClick={manageIdentityClidked}
+                    title="Manage Identities" 
+                    subtitle="Cycle keys to a new identity"
+                />
 
             </div>
 
@@ -48,6 +66,7 @@ function SettingsShell(){
                 <Switch>
                     <Route exact path="/settings" render={() => <SettingsMenu/>}/>
                     <Route path="/settings/edit-shardholders" render={() => <EditShardholders/>}/>
+                    <Route path="/settings/keys" render={() => <CycleKeys/>}/>
                 </Switch>
             
             </div>

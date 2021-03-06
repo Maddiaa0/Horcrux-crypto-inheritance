@@ -9,6 +9,8 @@ import keyManager from "../../../services/KeyManager";
 import cryptoManager from "../../../services/CryptoManager";
 import RecoveryContractManager from "../../../services/RecoveryContractManager";
 
+const ethUtil = require('ethereumjs-util')
+
 function CreateRecoveryContract(){
     const history = useHistory();
 
@@ -18,7 +20,8 @@ function CreateRecoveryContract(){
     async function getKeys(){
         const _keys = keyManager.getKeysFromStorage("password");
         console.log(_keys);
-        const _ethAddress = await cryptoManager.createEthAddressFromPubKey(_keys.pubKey);
+        const addr = ethUtil.privateToAddress(`0x${_keys.privKey}`);
+        const _ethAddress = `0x${addr.toString("hex")}`;
         setEthAddress(_ethAddress);
         setKeys(_keys);
     }

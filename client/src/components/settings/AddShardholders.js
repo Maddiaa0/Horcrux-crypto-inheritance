@@ -52,11 +52,8 @@ function AddShardholders(){
         evt.preventDefault();
         const toBeShardholders = shareHolders.map(elem => elem.address);
 
-        if (toBeShardholders.length > 1){
-            RecoveryContractManager.batchAddShardholders(toBeShardholders);
-        } else {
-            RecoveryContractManager.singleAddShareholder(toBeShardholders[0]);
-        }
+        RecoveryContractManager.batchAddShardholders(toBeShardholders);
+        
     }
 
     return (

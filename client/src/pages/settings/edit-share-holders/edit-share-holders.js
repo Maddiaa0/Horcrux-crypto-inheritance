@@ -44,7 +44,7 @@ function EditShardHolders(){
 
     function handleShardholderClick(address){
         if (selectedShardholders.some(addr => addr === address)){
-            console.log("removeing")
+            console.log("removing")
             setSelectedShardholders(selectedShardholders.filter(addr => addr !== address));
         } else {
             setSelectedShardholders([...selectedShardholders, address]);
@@ -64,15 +64,15 @@ function EditShardHolders(){
      * Takes the selected shardholders and adds them to the user's contract blacklist
      */
     function addAddressesToBlacklist(){
+
+        // convert into an array of strings
+        const shardHolderArr = selectedShardholders.map(item => item.address);
+
         if (selectedShardholders.length < 1){
             // show a snack bar saying that not enough shareholders were selected
             setSnackBarOpen(true);
         } else {
-            if (selectedShardholders.length == 1){
-                RecoveryContractManager.blackListShareholder(selectedShardholders[0].address);
-            } else {
-                RecoveryContractManager.batchBlacklistShardholder(selectedShardholders.address);
-            }
+            RecoveryContractManager.batchBlacklistShardholder(shardHolderArr);  
         }
     }
 
@@ -81,15 +81,15 @@ function EditShardHolders(){
      * Takes the selected blacklistees and removes them from the current user's blacklist
      */
     function removeAddressesFromBlacklist(){
+        // convert into an array of strings
+        const shardHolderArr = selectedShardholders.map(item => item.address);
+
         if (selectedBlacklist.length < 1){
             // show a snack bar saying that not enough shareholders were selected
             setSnackBarOpen(true);
         } else {
-            if (selectedBlacklist.length == 1){
-                RecoveryContractManager.removeBlackListShareholder(selectedBlacklist[0].address);
-            } else {
-                RecoveryContractManager.batchRemoveBlacklistShardholder(selectedBlacklist.address);
-            }
+            RecoveryContractManager.batchRemoveBlacklistShardholder(shardHolderArr);
+            
         }
     }
 

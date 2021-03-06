@@ -1,0 +1,389 @@
+{
+  "contractName": "IShardNFT",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_shardOwner",
+          "type": "address"
+        },
+        {
+          "internalType": "string",
+          "name": "tokenURI",
+          "type": "string"
+        }
+      ],
+      "name": "distributeShard",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.7.4+commit.3f05b770\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_shardOwner\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"tokenURI\",\"type\":\"string\"}],\"name\":\"distributeShard\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"distributeShard(address,string)\":{\"notice\":\"Sends a token NFT to a given address\"}},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/C/Users/schee/Documents/Uni/FYP/Project/contracts/IShardNFT.sol\":\"IShardNFT\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/C/Users/schee/Documents/Uni/FYP/Project/contracts/IShardNFT.sol\":{\"keccak256\":\"0xbfdbff198b20810cd60e7975cfcb6bd0143a3e83fd8ea9f6c7a3be6198712490\",\"license\":\"UNLICENSED\",\"urls\":[\"bzz-raw://d466bf06ec4f52d42e731fab196d60396fee2e9dd39a0080ea0801767390c0e5\",\"dweb:/ipfs/QmbHkPcnDahz1hqbn4Prbfg19oMcz9t9aLKoRhLX1GqgRw\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "immutableReferences": {},
+  "generatedSources": [],
+  "deployedGeneratedSources": [],
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: UNLICENSED\r\npragma solidity ^0.7.4;\r\n\r\ninterface IShardNFT {\r\n    /**Sends a token NFT to a given address\r\n     *\r\n     *\r\n     */\r\n    function distributeShard(address _shardOwner, string memory tokenURI)\r\n        external\r\n        returns (uint256);\r\n}\r\n",
+  "sourcePath": "C:\\Users\\schee\\Documents\\Uni\\FYP\\Project\\contracts\\IShardNFT.sol",
+  "ast": {
+    "absolutePath": "/C/Users/schee/Documents/Uni/FYP/Project/contracts/IShardNFT.sol",
+    "exportedSymbols": {
+      "IShardNFT": [
+        65
+      ]
+    },
+    "id": 66,
+    "license": "UNLICENSED",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 54,
+        "literals": [
+          "solidity",
+          "^",
+          "0.7",
+          ".4"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "40:23:2"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 65,
+        "linearizedBaseContracts": [
+          65
+        ],
+        "name": "IShardNFT",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "documentation": {
+              "id": 55,
+              "nodeType": "StructuredDocumentation",
+              "src": "94:64:2",
+              "text": "Sends a token NFT to a given address"
+            },
+            "functionSelector": "542792b6",
+            "id": 64,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "distributeShard",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 60,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 57,
+                  "mutability": "mutable",
+                  "name": "_shardOwner",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 64,
+                  "src": "189:19:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 56,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "189:7:2",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 59,
+                  "mutability": "mutable",
+                  "name": "tokenURI",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 64,
+                  "src": "210:22:2",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 58,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "210:6:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "188:45:2"
+            },
+            "returnParameters": {
+              "id": 63,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 62,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 64,
+                  "src": "270:7:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 61,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "270:7:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "269:9:2"
+            },
+            "scope": 65,
+            "src": "164:115:2",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 66,
+        "src": "67:215:2"
+      }
+    ],
+    "src": "40:244:2"
+  },
+  "legacyAST": {
+    "attributes": {
+      "absolutePath": "/C/Users/schee/Documents/Uni/FYP/Project/contracts/IShardNFT.sol",
+      "exportedSymbols": {
+        "IShardNFT": [
+          65
+        ]
+      },
+      "license": "UNLICENSED"
+    },
+    "children": [
+      {
+        "attributes": {
+          "literals": [
+            "solidity",
+            "^",
+            "0.7",
+            ".4"
+          ]
+        },
+        "id": 54,
+        "name": "PragmaDirective",
+        "src": "40:23:2"
+      },
+      {
+        "attributes": {
+          "abstract": false,
+          "baseContracts": [
+            null
+          ],
+          "contractDependencies": [
+            null
+          ],
+          "contractKind": "interface",
+          "fullyImplemented": false,
+          "linearizedBaseContracts": [
+            65
+          ],
+          "name": "IShardNFT",
+          "scope": 66
+        },
+        "children": [
+          {
+            "attributes": {
+              "functionSelector": "542792b6",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "distributeShard",
+              "scope": 65,
+              "stateMutability": "nonpayable",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "text": "Sends a token NFT to a given address"
+                },
+                "id": 55,
+                "name": "StructuredDocumentation",
+                "src": "94:64:2"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_shardOwner",
+                      "scope": 64,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 56,
+                        "name": "ElementaryTypeName",
+                        "src": "189:7:2"
+                      }
+                    ],
+                    "id": 57,
+                    "name": "VariableDeclaration",
+                    "src": "189:19:2"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "tokenURI",
+                      "scope": 64,
+                      "stateVariable": false,
+                      "storageLocation": "memory",
+                      "type": "string",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "string",
+                          "type": "string"
+                        },
+                        "id": 58,
+                        "name": "ElementaryTypeName",
+                        "src": "210:6:2"
+                      }
+                    ],
+                    "id": 59,
+                    "name": "VariableDeclaration",
+                    "src": "210:22:2"
+                  }
+                ],
+                "id": 60,
+                "name": "ParameterList",
+                "src": "188:45:2"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "",
+                      "scope": 64,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 61,
+                        "name": "ElementaryTypeName",
+                        "src": "270:7:2"
+                      }
+                    ],
+                    "id": 62,
+                    "name": "VariableDeclaration",
+                    "src": "270:7:2"
+                  }
+                ],
+                "id": 63,
+                "name": "ParameterList",
+                "src": "269:9:2"
+              }
+            ],
+            "id": 64,
+            "name": "FunctionDefinition",
+            "src": "164:115:2"
+          }
+        ],
+        "id": 65,
+        "name": "ContractDefinition",
+        "src": "67:215:2"
+      }
+    ],
+    "id": 66,
+    "name": "SourceUnit",
+    "src": "40:244:2"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.7.4+commit.3f05b770.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.3.3",
+  "updatedAt": "2021-03-06T14:44:24.929Z",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {
+      "distributeShard(address,string)": {
+        "notice": "Sends a token NFT to a given address"
+      }
+    },
+    "version": 1
+  }
+}

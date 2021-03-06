@@ -1,0 +1,1451 @@
+{
+  "contractName": "IShardManager",
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "ownerAddress",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "contractAddress",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "step",
+          "type": "uint256"
+        }
+      ],
+      "name": "ShardRecoveryStep",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_recoveryContractOwner",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_threshold",
+          "type": "uint256"
+        }
+      ],
+      "name": "createRecoveryContract",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_contractOwner",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_sender",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_step",
+          "type": "uint256"
+        }
+      ],
+      "name": "updateRecoveryState",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_addressToCheck",
+          "type": "address"
+        }
+      ],
+      "name": "checkRecoveryContractAddress",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_addressToCheck",
+          "type": "address"
+        }
+      ],
+      "name": "checkRecoveryContractState",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_newOwner",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_currentOwner",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_childContractAddr",
+          "type": "address"
+        }
+      ],
+      "name": "setNewContractOwner",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.7.4+commit.3f05b770\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"ownerAddress\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"contractAddress\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"step\",\"type\":\"uint256\"}],\"name\":\"ShardRecoveryStep\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_addressToCheck\",\"type\":\"address\"}],\"name\":\"checkRecoveryContractAddress\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_addressToCheck\",\"type\":\"address\"}],\"name\":\"checkRecoveryContractState\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_recoveryContractOwner\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_threshold\",\"type\":\"uint256\"}],\"name\":\"createRecoveryContract\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_newOwner\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_currentOwner\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_childContractAddr\",\"type\":\"address\"}],\"name\":\"setNewContractOwner\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_contractOwner\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_sender\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_step\",\"type\":\"uint256\"}],\"name\":\"updateRecoveryState\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"setNewContractOwner(address,address,address)\":{\"details\":\"Is called by the child recovery contract to update the owner of a recovery contract\"}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"createRecoveryContract(address,uint256)\":{\"notice\":\"Create shard contract Any user wishing to initiate on chain recovery can interact with this contract in order to trigger an on chain recovery mechanism\"}},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/C/Users/schee/Documents/Uni/FYP/Project/contracts/IShardManager.sol\":\"IShardManager\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/C/Users/schee/Documents/Uni/FYP/Project/contracts/IShardManager.sol\":{\"keccak256\":\"0x8eee34527fde95d86c9a6dbcf3177d6d7977c2afaaa32abf29404857d045c0bf\",\"urls\":[\"bzz-raw://cd23fd0cd4aa8dacb2e1165c3a4ab716f75e220c3cf0802c35314dbfcbf0a6a0\",\"dweb:/ipfs/Qmd8FYrqYCBfVq1oWEWhSYnbHHFvLqgRC8236KmjjtSz3P\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "immutableReferences": {},
+  "generatedSources": [],
+  "deployedGeneratedSources": [],
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "pragma solidity ^0.7.4;\r\n\r\ninterface IShardManager {\r\n    // Event to store if recovery contracts have been created etc.\r\n    event ShardRecoveryStep(\r\n        address indexed ownerAddress,\r\n        address contractAddress,\r\n        uint256 step\r\n    );\r\n\r\n    /** Create shard contract\r\n     *\r\n     * Any user wishing to initiate on chain recovery can interact with this contract in order to trigger an\r\n     * on chain recovery mechanism\r\n     */\r\n    function createRecoveryContract(\r\n        address _recoveryContractOwner,\r\n        uint256 _threshold\r\n    ) external;\r\n\r\n    //TODO: Modify so that the user can let the others know if the before death / after death protocol is to be used\r\n    function updateRecoveryState(\r\n        address _contractOwner,\r\n        address _sender,\r\n        uint256 _step\r\n    ) external;\r\n\r\n    /**\r\n     *\r\n     */\r\n    function checkRecoveryContractAddress(address _addressToCheck)\r\n        external\r\n        returns (address);\r\n\r\n    function checkRecoveryContractState(address _addressToCheck)\r\n        external\r\n        returns (uint256);\r\n\r\n    /**\r\n        @dev Is called by the child recovery contract to update the owner of a recovery contract\r\n     */\r\n    function setNewContractOwner(\r\n        address _newOwner,\r\n        address _currentOwner,\r\n        address _childContractAddr\r\n    ) external;\r\n}\r\n",
+  "sourcePath": "C:\\Users\\schee\\Documents\\Uni\\FYP\\Project\\contracts\\IShardManager.sol",
+  "ast": {
+    "absolutePath": "/C/Users/schee/Documents/Uni/FYP/Project/contracts/IShardManager.sol",
+    "exportedSymbols": {
+      "IShardManager": [
+        52
+      ]
+    },
+    "id": 53,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 2,
+        "literals": [
+          "solidity",
+          "^",
+          "0.7",
+          ".4"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:1"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 52,
+        "linearizedBaseContracts": [
+          52
+        ],
+        "name": "IShardManager",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "anonymous": false,
+            "id": 10,
+            "name": "ShardRecoveryStep",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 9,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 4,
+                  "indexed": true,
+                  "mutability": "mutable",
+                  "name": "ownerAddress",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10,
+                  "src": "160:28:1",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "160:7:1",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 6,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "contractAddress",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10,
+                  "src": "199:23:1",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 5,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "199:7:1",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "step",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10,
+                  "src": "233:12:1",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 7,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "233:7:1",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "149:103:1"
+            },
+            "src": "126:127:1"
+          },
+          {
+            "documentation": {
+              "id": 11,
+              "nodeType": "StructuredDocumentation",
+              "src": "261:188:1",
+              "text": "Create shard contract\n Any user wishing to initiate on chain recovery can interact with this contract in order to trigger an\n on chain recovery mechanism"
+            },
+            "functionSelector": "10f1e3a4",
+            "id": 18,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "createRecoveryContract",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 16,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 13,
+                  "mutability": "mutable",
+                  "name": "_recoveryContractOwner",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 18,
+                  "src": "497:30:1",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 12,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "497:7:1",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 15,
+                  "mutability": "mutable",
+                  "name": "_threshold",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 18,
+                  "src": "538:18:1",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 14,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "538:7:1",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "486:77:1"
+            },
+            "returnParameters": {
+              "id": 17,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "572:0:1"
+            },
+            "scope": 52,
+            "src": "455:118:1",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "500793a9",
+            "id": 27,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "updateRecoveryState",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 25,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 20,
+                  "mutability": "mutable",
+                  "name": "_contractOwner",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 27,
+                  "src": "738:22:1",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 19,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "738:7:1",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 22,
+                  "mutability": "mutable",
+                  "name": "_sender",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 27,
+                  "src": "771:15:1",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 21,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "771:7:1",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 24,
+                  "mutability": "mutable",
+                  "name": "_step",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 27,
+                  "src": "797:13:1",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 23,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "797:7:1",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "727:90:1"
+            },
+            "returnParameters": {
+              "id": 26,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "826:0:1"
+            },
+            "scope": 52,
+            "src": "699:128:1",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "446d0d10",
+            "id": 34,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "checkRecoveryContractAddress",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 30,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 29,
+                  "mutability": "mutable",
+                  "name": "_addressToCheck",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 34,
+                  "src": "899:23:1",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 28,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "899:7:1",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "898:25:1"
+            },
+            "returnParameters": {
+              "id": 33,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 32,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 34,
+                  "src": "960:7:1",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 31,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "960:7:1",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "959:9:1"
+            },
+            "scope": 52,
+            "src": "861:108:1",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "455950b4",
+            "id": 41,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "checkRecoveryContractState",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 37,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 36,
+                  "mutability": "mutable",
+                  "name": "_addressToCheck",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 41,
+                  "src": "1013:23:1",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 35,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1013:7:1",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1012:25:1"
+            },
+            "returnParameters": {
+              "id": 40,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 39,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 41,
+                  "src": "1074:7:1",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 38,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1074:7:1",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1073:9:1"
+            },
+            "scope": 52,
+            "src": "977:106:1",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 42,
+              "nodeType": "StructuredDocumentation",
+              "src": "1091:110:1",
+              "text": "@dev Is called by the child recovery contract to update the owner of a recovery contract"
+            },
+            "functionSelector": "317c51b1",
+            "id": 51,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setNewContractOwner",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 49,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 44,
+                  "mutability": "mutable",
+                  "name": "_newOwner",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 51,
+                  "src": "1246:17:1",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 43,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1246:7:1",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 46,
+                  "mutability": "mutable",
+                  "name": "_currentOwner",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 51,
+                  "src": "1274:21:1",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 45,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1274:7:1",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 48,
+                  "mutability": "mutable",
+                  "name": "_childContractAddr",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 51,
+                  "src": "1306:26:1",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 47,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1306:7:1",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1235:104:1"
+            },
+            "returnParameters": {
+              "id": 50,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1348:0:1"
+            },
+            "scope": 52,
+            "src": "1207:142:1",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 53,
+        "src": "27:1325:1"
+      }
+    ],
+    "src": "0:1354:1"
+  },
+  "legacyAST": {
+    "attributes": {
+      "absolutePath": "/C/Users/schee/Documents/Uni/FYP/Project/contracts/IShardManager.sol",
+      "exportedSymbols": {
+        "IShardManager": [
+          52
+        ]
+      }
+    },
+    "children": [
+      {
+        "attributes": {
+          "literals": [
+            "solidity",
+            "^",
+            "0.7",
+            ".4"
+          ]
+        },
+        "id": 2,
+        "name": "PragmaDirective",
+        "src": "0:23:1"
+      },
+      {
+        "attributes": {
+          "abstract": false,
+          "baseContracts": [
+            null
+          ],
+          "contractDependencies": [
+            null
+          ],
+          "contractKind": "interface",
+          "fullyImplemented": false,
+          "linearizedBaseContracts": [
+            52
+          ],
+          "name": "IShardManager",
+          "scope": 53
+        },
+        "children": [
+          {
+            "attributes": {
+              "anonymous": false,
+              "name": "ShardRecoveryStep"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "indexed": true,
+                      "mutability": "mutable",
+                      "name": "ownerAddress",
+                      "scope": 10,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 3,
+                        "name": "ElementaryTypeName",
+                        "src": "160:7:1"
+                      }
+                    ],
+                    "id": 4,
+                    "name": "VariableDeclaration",
+                    "src": "160:28:1"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "indexed": false,
+                      "mutability": "mutable",
+                      "name": "contractAddress",
+                      "scope": 10,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 5,
+                        "name": "ElementaryTypeName",
+                        "src": "199:7:1"
+                      }
+                    ],
+                    "id": 6,
+                    "name": "VariableDeclaration",
+                    "src": "199:23:1"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "indexed": false,
+                      "mutability": "mutable",
+                      "name": "step",
+                      "scope": 10,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 7,
+                        "name": "ElementaryTypeName",
+                        "src": "233:7:1"
+                      }
+                    ],
+                    "id": 8,
+                    "name": "VariableDeclaration",
+                    "src": "233:12:1"
+                  }
+                ],
+                "id": 9,
+                "name": "ParameterList",
+                "src": "149:103:1"
+              }
+            ],
+            "id": 10,
+            "name": "EventDefinition",
+            "src": "126:127:1"
+          },
+          {
+            "attributes": {
+              "functionSelector": "10f1e3a4",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "createRecoveryContract",
+              "scope": 52,
+              "stateMutability": "nonpayable",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "text": "Create shard contract\n Any user wishing to initiate on chain recovery can interact with this contract in order to trigger an\n on chain recovery mechanism"
+                },
+                "id": 11,
+                "name": "StructuredDocumentation",
+                "src": "261:188:1"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_recoveryContractOwner",
+                      "scope": 18,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 12,
+                        "name": "ElementaryTypeName",
+                        "src": "497:7:1"
+                      }
+                    ],
+                    "id": 13,
+                    "name": "VariableDeclaration",
+                    "src": "497:30:1"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_threshold",
+                      "scope": 18,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 14,
+                        "name": "ElementaryTypeName",
+                        "src": "538:7:1"
+                      }
+                    ],
+                    "id": 15,
+                    "name": "VariableDeclaration",
+                    "src": "538:18:1"
+                  }
+                ],
+                "id": 16,
+                "name": "ParameterList",
+                "src": "486:77:1"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 17,
+                "name": "ParameterList",
+                "src": "572:0:1"
+              }
+            ],
+            "id": 18,
+            "name": "FunctionDefinition",
+            "src": "455:118:1"
+          },
+          {
+            "attributes": {
+              "functionSelector": "500793a9",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "updateRecoveryState",
+              "scope": 52,
+              "stateMutability": "nonpayable",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_contractOwner",
+                      "scope": 27,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 19,
+                        "name": "ElementaryTypeName",
+                        "src": "738:7:1"
+                      }
+                    ],
+                    "id": 20,
+                    "name": "VariableDeclaration",
+                    "src": "738:22:1"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_sender",
+                      "scope": 27,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 21,
+                        "name": "ElementaryTypeName",
+                        "src": "771:7:1"
+                      }
+                    ],
+                    "id": 22,
+                    "name": "VariableDeclaration",
+                    "src": "771:15:1"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_step",
+                      "scope": 27,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 23,
+                        "name": "ElementaryTypeName",
+                        "src": "797:7:1"
+                      }
+                    ],
+                    "id": 24,
+                    "name": "VariableDeclaration",
+                    "src": "797:13:1"
+                  }
+                ],
+                "id": 25,
+                "name": "ParameterList",
+                "src": "727:90:1"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 26,
+                "name": "ParameterList",
+                "src": "826:0:1"
+              }
+            ],
+            "id": 27,
+            "name": "FunctionDefinition",
+            "src": "699:128:1"
+          },
+          {
+            "attributes": {
+              "functionSelector": "446d0d10",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "checkRecoveryContractAddress",
+              "scope": 52,
+              "stateMutability": "nonpayable",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_addressToCheck",
+                      "scope": 34,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 28,
+                        "name": "ElementaryTypeName",
+                        "src": "899:7:1"
+                      }
+                    ],
+                    "id": 29,
+                    "name": "VariableDeclaration",
+                    "src": "899:23:1"
+                  }
+                ],
+                "id": 30,
+                "name": "ParameterList",
+                "src": "898:25:1"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "",
+                      "scope": 34,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 31,
+                        "name": "ElementaryTypeName",
+                        "src": "960:7:1"
+                      }
+                    ],
+                    "id": 32,
+                    "name": "VariableDeclaration",
+                    "src": "960:7:1"
+                  }
+                ],
+                "id": 33,
+                "name": "ParameterList",
+                "src": "959:9:1"
+              }
+            ],
+            "id": 34,
+            "name": "FunctionDefinition",
+            "src": "861:108:1"
+          },
+          {
+            "attributes": {
+              "functionSelector": "455950b4",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "checkRecoveryContractState",
+              "scope": 52,
+              "stateMutability": "nonpayable",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_addressToCheck",
+                      "scope": 41,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 35,
+                        "name": "ElementaryTypeName",
+                        "src": "1013:7:1"
+                      }
+                    ],
+                    "id": 36,
+                    "name": "VariableDeclaration",
+                    "src": "1013:23:1"
+                  }
+                ],
+                "id": 37,
+                "name": "ParameterList",
+                "src": "1012:25:1"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "",
+                      "scope": 41,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 38,
+                        "name": "ElementaryTypeName",
+                        "src": "1074:7:1"
+                      }
+                    ],
+                    "id": 39,
+                    "name": "VariableDeclaration",
+                    "src": "1074:7:1"
+                  }
+                ],
+                "id": 40,
+                "name": "ParameterList",
+                "src": "1073:9:1"
+              }
+            ],
+            "id": 41,
+            "name": "FunctionDefinition",
+            "src": "977:106:1"
+          },
+          {
+            "attributes": {
+              "functionSelector": "317c51b1",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "setNewContractOwner",
+              "scope": 52,
+              "stateMutability": "nonpayable",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "text": "@dev Is called by the child recovery contract to update the owner of a recovery contract"
+                },
+                "id": 42,
+                "name": "StructuredDocumentation",
+                "src": "1091:110:1"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_newOwner",
+                      "scope": 51,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 43,
+                        "name": "ElementaryTypeName",
+                        "src": "1246:7:1"
+                      }
+                    ],
+                    "id": 44,
+                    "name": "VariableDeclaration",
+                    "src": "1246:17:1"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_currentOwner",
+                      "scope": 51,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 45,
+                        "name": "ElementaryTypeName",
+                        "src": "1274:7:1"
+                      }
+                    ],
+                    "id": 46,
+                    "name": "VariableDeclaration",
+                    "src": "1274:21:1"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "_childContractAddr",
+                      "scope": 51,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 47,
+                        "name": "ElementaryTypeName",
+                        "src": "1306:7:1"
+                      }
+                    ],
+                    "id": 48,
+                    "name": "VariableDeclaration",
+                    "src": "1306:26:1"
+                  }
+                ],
+                "id": 49,
+                "name": "ParameterList",
+                "src": "1235:104:1"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 50,
+                "name": "ParameterList",
+                "src": "1348:0:1"
+              }
+            ],
+            "id": 51,
+            "name": "FunctionDefinition",
+            "src": "1207:142:1"
+          }
+        ],
+        "id": 52,
+        "name": "ContractDefinition",
+        "src": "27:1325:1"
+      }
+    ],
+    "id": 53,
+    "name": "SourceUnit",
+    "src": "0:1354:1"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.7.4+commit.3f05b770.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.3.3",
+  "updatedAt": "2021-03-06T14:44:24.921Z",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {
+      "setNewContractOwner(address,address,address)": {
+        "details": "Is called by the child recovery contract to update the owner of a recovery contract"
+      }
+    },
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {
+      "createRecoveryContract(address,uint256)": {
+        "notice": "Create shard contract Any user wishing to initiate on chain recovery can interact with this contract in order to trigger an on chain recovery mechanism"
+      }
+    },
+    "version": 1
+  }
+}

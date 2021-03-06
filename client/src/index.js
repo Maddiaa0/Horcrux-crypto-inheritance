@@ -1,10 +1,11 @@
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {BrowserRouter as Router} from 'react-router-dom';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
-
+;global.WebSocket = require("isomorphic-ws");
 ReactDOM.render(
     <Router>
         <App/>
@@ -16,3 +17,6 @@ ReactDOM.render(
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://bit.ly/CRA-PWA
 serviceWorker.unregister();
+
+// add websockets so textile functions properly
+

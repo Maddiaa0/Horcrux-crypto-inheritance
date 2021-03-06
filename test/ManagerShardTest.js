@@ -12,7 +12,7 @@ contract("Shard Manager Contract", accounts => {
   const accountAlice = accounts[2];
   const accountBob = accounts[3];
 
-  let deployedmanager, amount, logs
+  let deployedManager, amount, logs
 
   // Get a fresh instance of the contract before each test
   beforeEach(async function() {
@@ -27,22 +27,30 @@ contract("Shard Manager Contract", accounts => {
       const _threshold = 3;
       const result = await deployedManager.createRecoveryContract(goverance, _threshold, {from: goverance});
       const userRecoveryAddress = result.logs[0].args.contractAddress;
-      const userOwnerAddress = result.logs[0].args.ownerAddress;
-      const userRecoveryContractState = result.logs[0].args.step;
+      const userOwnerAddress = result.logs[0].args.ownerAddress; 
 
       expect(userRecoveryAddress).to.not.be.equal(null);
       expect(userOwnerAddress).to.be.equal(goverance);
-      expect(userRecoveryContractState).to.be.a.bignumber.equal(new BN(0));
 
     });  
 
-    it("Should be able to retreive recovery contract address and state", async () => {
-      const recoveryContractAddress = await deployedManager.checkRecoveryContractAddress(goverance);
+    it("Should be able to retreive recovery contract address", async () => {
+      const recoveryContractAddress = await deployedManager.contractMappings.call(goverance);
       expect(recoveryContractAddress).to.not.be.equal(null);
-      const recoveryContractState = await deployedManager.checkRecoveryContractState(goverance);
-      expect(recoveryContractState).to.be.a.bignumber.equal(new BN(0));
     });
   
   
+  });
+
+  describe("Normal addresses should not be able to trigger the transfer contract owner function", async function(){
+    it("Should revert transactions to transfer owner made by addresses", async function(){
+      const recoveryContractAddress = await deployedManager.contractMappings.call(goverance);
+      expect(recoveryContractAddress).to.not.be.equal(null);
+
+      await expectRevert(
+        deployedManager.setNewContractOwner(notGovernance, goverance, recoveryContractAddress, { from: goverance }),
+        'Sender not Contract',
+      );
+    })
   });
 });

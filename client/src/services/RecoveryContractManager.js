@@ -66,7 +66,7 @@ class RecoveryContractManager{
         if (!this.masterRecoveryContract){
             await this.initWeb3Provider();
         }
-        const recoveryAddress = await this.masterRecoveryContract.methods.checkRecoveryContractAddress(address).call({from: this.web3.currentProvider.selectedAddress});
+        const recoveryAddress = await this.masterRecoveryContract.methods.contractMappings(address).call({from: this.web3.currentProvider.selectedAddress});
         console.log(recoveryAddress);
         this.recoveryContractAddress = recoveryAddress;
         this.recoveryContract = new this.web3.eth.Contract(
@@ -145,47 +145,6 @@ class RecoveryContractManager{
             });
     }
 
-    /**Single Add Shareholder
-     * 
-     * Add a singlular shareholder to the recovery contract - this is done to make the operation more
-     * gas efficient that by adding batches.
-     * @param {String} shardholder 
-     */
-    async singleAddShareholder(shareholder){
-        if (typeof shareholder != "string"){
-            throw Error("A single shard holder must be a string");
-        }
-
-        const result = await this.recoveryContract.methods.addShardholder(shareholder).send(
-            {from: this.web3.currentProvider.selectedAddress},
-            function(err, res){
-                if (err){
-                    console.log("Adding shareholder failed");
-                    return;
-                }
-                console.log("Hash of the transaction - single shareholder added - " + res);
-            }
-        )
-    }
-
-
-    async blackListShareholder(shardholder){
-        if (typeof shardholder !== "string"){
-            throw Error("A single shard holder must be a string");
-        }
-
-        const result = await this.recoveryContract.methods.blackListShardholder(shardholder).send(
-            {from: this.web3.currentProvider.selectedAddress},
-            function(err, res){
-                if (err){
-                    console.log("Blacklisting shareholder failed");
-                    return;
-                }
-                console.log("Hash of the transaction - single blacklist added - " + res);
-            }
-        )
-    }
-
     async batchBlacklistShardholder(shardholders){
         if (typeof shardholders !== "array" && shardholders.length < 1){
             throw Error("Shardholers must be an array and have more than 1 item - use non batch operation");
@@ -199,23 +158,6 @@ class RecoveryContractManager{
                 } 
                 console.log("Hash of the transaction - batch blacklist - " + res);
             });
-    }
-
-    async removeBlackListShareholder(shardholder){
-        if (typeof shardholder !== "string"){
-            throw Error("A single shard holder must be a string");
-        }
-
-        const result = await this.recoveryContract.methods.removeBlacklistShardholder(shardholder).send(
-            {from: this.web3.currentProvider.selectedAddress},
-            function(err, res){
-                if (err){
-                    console.log("Removing Blacklisting shareholder failed");
-                    return;
-                }
-                console.log("Hash of the transaction - removal single blacklist added - " + res);
-            }
-        )
     }
 
 
@@ -287,6 +229,17 @@ class RecoveryContractManager{
             shardholder,
             blacklisted
         };
+    }
+
+    async transferOwnerShip(address, callback){
+        this.recoveryContract.methods.transferOwnerShip(address).call({from: this.web3.currentProvider.selectedAddress}, function(err, res){
+            if (err){
+                console.log("Transferring Ownership failed");
+                callback(false);       
+            }
+            console.log("New owner transaction hash - " + res);
+            callback(true);
+        });
     }
 
     //-------------------------------------------------------------------------------------------------------------------------------------

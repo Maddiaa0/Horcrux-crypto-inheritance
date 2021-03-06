@@ -14,6 +14,15 @@ import recoveryContractManager from './services/RecoveryContractManager';
 import web3Service from './services/Web3Service';
 import VerifyPage from './pages/verify-page/VerifyPage';
 
+// import drizzleOptions from "./drizzleOptions";
+// import {Drizzle} from "@drizzle/store";
+// import {drizzleReactHooks} from "@drizzle/react-plugin";
+import CreateDataVault from './pages/create-data-vault/CreateDataVault';
+
+
+// const drizzle = new Drizzle(drizzleOptions);
+// const {DrizzleProvider} = drizzleReactHooks;
+
 /**
  * App
  * 
@@ -29,22 +38,27 @@ function App(){
 
     return (
         <div className="App">
-            <Switch>
-                {/* For current test purpsoes */}
-                <Route path="/setup" render={() => <OnboardingShell/>}/>
+            {/* <DrizzleProvider drizzle={drizzle}> */}
+                <Switch>
+                    {/* For current test purpsoes */}
+                    <Route path="/setup" render={() => <OnboardingShell/>}/>
 
-                {/* For the settings tab*/}
-                <Route path="/settings" render={() => <SettingsShell/>}/>
+                    {/* For the settings tab*/}
+                    <Route path="/settings" render={() => <SettingsShell/>}/>
 
-                {/* For when a user wishes to verify themselves as a trustee */}
-                <Route path="/verify" render={() => <VerifyPage/>}/>
+                    {/* For when a user wishes to verify themselves as a trustee */}
+                    <Route path="/verify" render={() => <VerifyPage/>}/>
 
-                {/* Perform general onboarding  */}
-                {/* <Route path="/signup" render={() => <SignUpView/>}/> */}
+                    {/* For testing creating the vault */}
+                    <Route path="/create-vault" render={() => <CreateDataVault/>}/>
 
-                {/* Check if a user is already logged in, if so, route them to home, otherwise to signup */}
-                {/* <Route exact path="/" render={() => <HandlePathing />} /> */}
-            </Switch>
+                    {/* Perform general onboarding  */}
+                    {/* <Route path="/signup" render={() => <SignUpView/>}/> */}
+
+                    {/* Check if a user is already logged in, if so, route them to home, otherwise to signup */}
+                    {/* <Route exact path="/" render={() => <HandlePathing />} /> */}
+                </Switch>
+            {/* </DrizzleProvider> */}
         </div>
     );
 }

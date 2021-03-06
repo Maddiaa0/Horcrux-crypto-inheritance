@@ -8,23 +8,21 @@ import "./Recovery.sol";
  */
 contract ShardManager {
     // An enum to list what state the recovery of a token is in
-    enum RecoveryState {Created, Normal, StandardRecovery, AfterDeath}
+    // enum RecoveryState {Normal, StandardRecovery, AfterDeath}
 
     // This struct keeps track of who owns what contracts and the location of their recovery contracts
-    struct RecoveryContracts {
-        Recovery recoveryContract;
-        RecoveryState recoveryState;
-    }
+    // struct RecoveryContracts {
+    //     address recoveryContractAddress;
+    //     RecoveryState recoveryState;
+    // }
 
-    // Store metadata about who ovms a contract address and the state of the contract -> is it in recovery or is the owner said to have died
-    mapping(address => RecoveryContracts) contractMappings;
-
-    // Event to store if recovery contracts have been created etc.
     event ShardRecoveryStep(
         address indexed ownerAddress,
-        address contractAddress,
-        uint256 step
+        address contractAddress
     );
+
+    // Store metadata about who ovms a contract address and the state of the contract -> is it in recovery or is the owner said to have died
+    mapping(address => address) public contractMappings;
 
     /** Create shard contract
      *
@@ -37,18 +35,22 @@ contract ShardManager {
     ) public {
         // create the new recovery contract
         Recovery userRecoveryContract =
-            new Recovery(this, _recoveryContractOwner, uint8(_threshold));
+            new Recovery(
+                address(this),
+                _recoveryContractOwner,
+                uint8(_threshold)
+            );
 
         // update the contract mappings struct
-        contractMappings[_recoveryContractOwner]
-            .recoveryContract = userRecoveryContract;
-        contractMappings[_recoveryContractOwner].recoveryState = RecoveryState
-            .Created;
+        contractMappings[_recoveryContractOwner] = address(
+            userRecoveryContract
+        );
+        // contractMappings[_recoveryContractOwner].recoveryState = RecoveryState
+        // .Normal;
 
         emit ShardRecoveryStep(
             address(_recoveryContractOwner),
-            address(userRecoveryContract),
-            uint256(contractMappings[_recoveryContractOwner].recoveryState)
+            address(userRecoveryContract)
         );
     }
 
@@ -70,35 +72,33 @@ contract ShardManager {
         //TODO: fix this here
         bool sentFromContract = true;
         bool senderIsTrusted = true;
-        require(sentFromContract && senderIsTrusted, "Not sent by a trustee");
+        require(sentFromContract && senderIsTrusted, "Sender not trustee");
 
-        contractMappings[_contractOwner].recoveryState = RecoveryState
-            .StandardRecovery;
+        // contractMappings[_contractOwner].recoveryState = RecoveryState
+        //     .StandardRecovery;
 
         // emit an evnt notifying that the current step has been updated
         emit ShardRecoveryStep(
             address(_contractOwner),
-            address(contractMappings[_contractOwner].recoveryContract),
-            uint256(_step)
+            address(contractMappings[_contractOwner])
         );
     }
 
     /**
-     *
+        @dev Is called by the child recovery contract to update the owner of a recovery contract
      */
-    function checkRecoveryContractAddress(address _addressToCheck)
-        public
-        view
-        returns (address)
-    {
-        return address(contractMappings[_addressToCheck].recoveryContract);
-    }
+    function setNewContractOwner(
+        address _newOwner,
+        address _currentOwner,
+        address _childContractAddr
+    ) public {
+        require(
+            msg.sender == contractMappings[_currentOwner] &&
+                contractMappings[_currentOwner] == address(_childContractAddr),
+            "Sender not Contract"
+        );
 
-    function checkRecoveryContractState(address _addressToCheck)
-        public
-        view
-        returns (uint256)
-    {
-        return uint256(contractMappings[_addressToCheck].recoveryState);
+        contractMappings[_newOwner] = _childContractAddr;
+        // contractMappings[_newOwner].recoveryState = RecoveryState.Normal;
     }
 }
