@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from "react";
-import CASManager from "../../services/CasManager";
+import CASManager from "../../../services/CasManager";
 
 
 /**Create Data Vault
@@ -15,9 +15,17 @@ function CreateDataVault(){
     useEffect(() => {
         CASManager.initTextileForUser();
     });
+
+    async function testCrypto(){
+        const encrypt = await CASManager.testEncrypt();
+        const decrypt = await CASManager.testDecrypt(encrypt);
+    }
     
     return (
-        <div>CREATE DATA VAULT</div>
+        <>
+            <div>CREATE DATA VAULT</div>
+            <button type="button" onClick={() => testCrypto()}>Test assymetric</button>
+        </>
     )
 }
 

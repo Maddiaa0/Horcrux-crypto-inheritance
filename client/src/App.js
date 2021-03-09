@@ -17,7 +17,8 @@ import VerifyPage from './pages/verify-page/VerifyPage';
 // import drizzleOptions from "./drizzleOptions";
 // import {Drizzle} from "@drizzle/store";
 // import {drizzleReactHooks} from "@drizzle/react-plugin";
-import CreateDataVault from './pages/create-data-vault/CreateDataVault';
+import CreateDataVault from './pages/vault/create-data-vault/CreateDataVault';
+import VaultRouter from './pages/vault/vault-shell/VaultRouter';
 
 
 // const drizzle = new Drizzle(drizzleOptions);
@@ -45,6 +46,9 @@ function App(){
 
                     {/* For the settings tab*/}
                     <Route path="/settings" render={() => <SettingsShell/>}/>
+
+                    {/* Vault stuff */}
+                    <Route path="/vault" render={() => <VaultRouter/>}/>
 
                     {/* For when a user wishes to verify themselves as a trustee */}
                     <Route path="/verify" render={() => <VerifyPage/>}/>

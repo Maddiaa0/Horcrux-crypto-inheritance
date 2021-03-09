@@ -9,10 +9,10 @@ import { keys } from '@material-ui/core/styles/createBreakpoints';
 import cryptoManager from './CryptoManager';
 import keyManager from './KeyManager';
 import eccrypto from "eccrypto";
+import axios from "axios";
+
 
 import local from '../config/local';
-
-
 const ethUtil = require('ethereumjs-util')
 
 const TEXTILE_KEY_OBJECT = {
@@ -29,6 +29,7 @@ class CasManager {
         const ipfs = ipfsClient({ host: 'localhost', port: '5001', protocol: 'http' });
         this.ipfs = ipfs;
         this.userIdentity = null;
+        this.userBucketInfo = null;
     }
 
     /**
@@ -53,13 +54,63 @@ class CasManager {
 
 
     async addFileToIpds(_file){
-        const CID = await this.ipfs.add(_file);
+        const file = Buffer.from(_file);
+        const CID = await this.ipfs.add(file);
         return CID;
     }
 
+    // async getFileFromCID(_cid){
+    //     const file = await this.ipfs.get(_cid);
+    //     return file;
+    // }
+
+    // big file version of this
+    // async getFileFromCID(_cid){
+    //   for await (const file of this.ipfs.get(_cid)){
+    //     const content = new BufferList()
+    //     for await (const chunk of file.content){
+    //       content.append(chunk)
+    //     }
+
+    //     console.log(content);
+    //     return content.toString();
+    //   }
+    //   return null;
+    // }
+
+    // another failed attempt
+    // async getFileFromCID(_cid){
+    //   for await (const file of this.ipfs.get(_cid)){
+    //     console.log(file);
+    //     console.log(file.content.toString("utf8"))
+    //     for await (const chunk of file.content){
+    //       console.log(chunk.toString("utf8"));
+    //     }
+    //   }
+    //   return null;
+    // }
+
     async getFileFromCID(_cid){
-        const file = await this.ipfs.get(_cid);
-        return file;
+      const res = await axios.get(`http://localhost:8080/ipfs/${_cid}`);
+      if (res.status == 200){
+        console.log(res.data);
+        return res.data;
+      } else {
+        return null;
+      }
+    }
+
+    async getBufferFromCID(_cid){
+      let file = [];
+      for await (const file of this.ipfs.get(_cid)){
+        for await (const chunk of file.content){
+          file.append(chunk);
+        }
+      }
+
+      // get the file buffer from ipfs
+      file = file.concat(file);
+      return file;
     }
 
 
@@ -122,7 +173,13 @@ class CasManager {
         // set up the the client
         const client = await this.authorizeDev();
         const returned = await this.setUpUserBuckets();
+        this.userBucketInfo = returned;
         console.log(returned);
+
+        // return if the userBucket has been initialised successfully
+        if (this.userBucketInfo !== null) return true;
+        else return false;
+        
     }
 
     // async getIdentity(){
@@ -171,7 +228,8 @@ class CasManager {
         }
         return {
             buckets: buckets,
-            bucketKey: bucketResult.root.key
+            bucketKey: bucketResult.root.key,
+            userBucket: bucketResult
         };
     }
 
@@ -279,46 +337,103 @@ class CasManager {
       }
 
 
-      // add file to ipfs after encrypting
-      async addFileToIPFS(textilePath, filePath, fileName){
+      /**Add File To IPFS
+       * 
+       * This method performs a number of steps
+       * 1. Encrypts file 
+       * 2. Uploads to IPFS
+       * 3. Creates metadata object pointing to that file
+       * 4. Asymmetrically encrypts metadata file
+       * 5. Returns CID pointing to that metadata file
+       * 
+       * @returns {String} CID of the uploaded metadata file
+       * 
+       * @param {String} textilePath 
+       * @param {Buffer | String} fileBuffer 
+       * @param {String} fileName 
+       * @param {boolean} isPath 
+       */
+      async addFileToIPFS(textilePath, fileBuffer, fileName, isPath){
         // encrypt the file with an ephemeral key  
         // first add the file to ipfs
           // get the hash of the uploaded file
           // add the uploaded file to the given path in textile? - that should do it
-        const {encryptedBuffer, ephKey} = CryptoManager.encryptFileForIPFS(filePath);
-        
+        const {encryptedBuffer, ephKey} = await CryptoManager.encryptFileForIPFS(fileBuffer, isPath);
+
         // add file to ipfs
-        const CID = this.addFileToIPFS(encryptedBuffer);
+        const CID = await this.addFileToIpds(encryptedBuffer);
+        console.log(CID);
 
         // Meta Data Object
         const metaData = {
             name: fileName,
             owner: "Ethereum address", //TODO: add ethereum address
             ephKey: ephKey,
-            CID: CID
+            CID: CID.path
         };
 
         const keys = await keyManager.getKeysFromStorage("password");
+
         // asynmetrically encrypt the meta data
-        const encrypted = eccrypto.encrypt(keys.pubKey, Buffer.from(JSON.stringify(metaData)));
-        const CID = this.addFileToIPFS(encrypted);
+        const encrypted = await CryptoManager.assymetricEncrypt(keys.pubKey, JSON.stringify(metaData));
+        const uploadedFileCID = await this.addFileToIpds(JSON.stringify(encrypted));
+        console.log(uploadedFileCID.path);
 
         // add the file to textile!!
+        return uploadedFileCID.path;
 
       }
 
-      // get file from IPFS
+      /**Get File from IPFS
+       * 
+       * Takes the CID of the metadata file which contains an asymmetrically encrypred json object
+       * containing the real objects location and the ephemeral encryption key.
+       * This method
+       * 1. Retreives metadata file
+       * 2. Decrypts with the currently logged in user's keys
+       * 3. Fetches the real file 
+       * 4. Decrypts and returns the real file
+       * 
+       * @returns {Buffer} DecryptedFile
+       * 
+       * @param {String} metaDataCID 
+       */
       async getFileFromIPFS(metaDataCID){
         // this will return the metadata file
-        const encryptedMetadata = this.getFileFromCID(metaDataCID);
-        const decryptedMetaData = JSON.parse((await eccrypto.decrypt(encryptedMetadata)).toString());
+        const keys = await keyManager.getKeysFromStorage("password");
+        const encryptedMetadata = await this.getFileFromCID(metaDataCID);
+        const decryptedMetaData = JSON.parse(await CryptoManager.assymetricDecrypt(keys.privKey, encryptedMetadata));
 
         // get the full file form IPFS
-        const encryptedFile = await thie.getFileFromCID(decryptedMetaData.CID);
-        const decryptedFile = CryptoManager.decryptFileFromIPFS(encryptedFile, decryptedMetaData.ephKey);
-
-        return decryptedFile;
+        const fileBuffer = Buffer.from(await this.getFileFromCID(decryptedMetaData.CID));
+        const decryptedBuffer = CryptoManager.decryptSymmetricBuffer(fileBuffer, decryptedBuffer.ephKey);
+        console.log(decryptedBuffer.toString());
+        return decryptedBuffer;
       }
+
+
+
+      // test encrypt TODO: REMOVE THeSE AS CLUTTER
+      async testEncrypt(){
+        console.log("using currently logged in users public key to encrypt");
+        const keys = await keyManager.getKeysFromStorage("password");
+        // asynmetrically encrypt the meta data
+        const encrypted = await eccrypto.encrypt(Buffer.from(keys.pubKey, "hex"), Buffer.from("Here is the test decryption phrase"));
+        console.log(encrypted);
+        return encrypted;
+      }
+
+      async testDecrypt(encrypted){
+        console.log("Using currently logged in users private key to decrypt");
+        const keys = await keyManager.getKeysFromStorage("password");
+
+        const decryptedMetaData = (await eccrypto.decrypt(Buffer.from(keys.privKey, "hex"), encrypted)).toString();
+        console.log(decryptedMetaData);
+        return decryptedMetaData;
+      }
+
+
+      // test decrypt
 
 }
 
