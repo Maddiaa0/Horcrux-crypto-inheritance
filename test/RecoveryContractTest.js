@@ -142,6 +142,9 @@ contract("Recovery Contract", accounts => {
         const verifyResult = await deployedRecovery.confirmTrustee({from: notGovernance});
         const confirmed = await deployedRecovery.confirmed(notGovernance, {from: goverance});
 
+        const blockNumber = await deployedRecovery.confirmedBlockNo(notGovernance, {from:goverance});
+        console.log(blockNumber);
+
         expect(confirmed).to.be.equal(true);
     });
 

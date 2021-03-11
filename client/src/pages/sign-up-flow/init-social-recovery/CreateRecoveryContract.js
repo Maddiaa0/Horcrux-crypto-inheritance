@@ -6,7 +6,7 @@ import {Button} from "@material-ui/core";
 import SignUpTitle from "../../../components/sign-up/SignUpTitle";
 import SignUpParagraph from "../../../components/sign-up/SignUpParagraph";
 import keyManager from "../../../services/KeyManager";
-import cryptoManager from "../../../services/CryptoManager";
+import CryptoManager from "../../../services/CryptoManager";
 import RecoveryContractManager from "../../../services/RecoveryContractManager";
 
 const ethUtil = require('ethereumjs-util')
@@ -32,10 +32,15 @@ function CreateRecoveryContract(){
 
 
     async function createRecoveryContract(){
-        RecoveryContractManager.createRecoveryContract(ethAddress)
+        // handle the creation of the recovery contract
+        RecoveryContractManager.createRecoveryContract(ethAddress);
         RecoveryContractManager.listenForRecoveryContractCreation(ethAddress, function(){
             alert("Recovery Contract Created Successfully");
-        })
+        });
+        
+        // create all of the shares to be used for social recovery
+        const mnemonic = keyManager.getMnemonicFromStorage("password");
+        CryptoManager.createSharesAndKeepInStorage(mnemonic, 3, "password");
     }
 
     function createContract(evt){

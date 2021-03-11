@@ -50,15 +50,15 @@
     "absolutePath": "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol",
     "exportedSymbols": {
       "IERC721Receiver": [
-        2442
+        2416
       ]
     },
-    "id": 2443,
+    "id": 2417,
     "license": "MIT",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 2426,
+        "id": 2400,
         "literals": [
           "solidity",
           ">=",
@@ -77,44 +77,44 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "documentation": {
-          "id": 2427,
+          "id": 2401,
           "nodeType": "StructuredDocumentation",
           "src": "66:152:15",
           "text": " @title ERC721 token receiver interface\n @dev Interface for any contract that wants to support safeTransfers\n from ERC721 asset contracts."
         },
         "fullyImplemented": false,
-        "id": 2442,
+        "id": 2416,
         "linearizedBaseContracts": [
-          2442
+          2416
         ],
         "name": "IERC721Receiver",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "documentation": {
-              "id": 2428,
+              "id": 2402,
               "nodeType": "StructuredDocumentation",
               "src": "251:485:15",
               "text": " @dev Whenever an {IERC721} `tokenId` token is transferred to this contract via {IERC721-safeTransferFrom}\n by `operator` from `from`, this function is called.\n It must return its Solidity selector to confirm the token transfer.\n If any other value is returned or the interface is not implemented by the recipient, the transfer will be reverted.\n The selector can be obtained in Solidity with `IERC721.onERC721Received.selector`."
             },
             "functionSelector": "150b7a02",
-            "id": 2441,
+            "id": 2415,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "onERC721Received",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 2437,
+              "id": 2411,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2430,
+                  "id": 2404,
                   "mutability": "mutable",
                   "name": "operator",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2441,
+                  "scope": 2415,
                   "src": "767:16:15",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -123,7 +123,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2429,
+                    "id": 2403,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "767:7:15",
@@ -137,11 +137,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 2432,
+                  "id": 2406,
                   "mutability": "mutable",
                   "name": "from",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2441,
+                  "scope": 2415,
                   "src": "785:12:15",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -150,7 +150,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2431,
+                    "id": 2405,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "785:7:15",
@@ -164,11 +164,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 2434,
+                  "id": 2408,
                   "mutability": "mutable",
                   "name": "tokenId",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2441,
+                  "scope": 2415,
                   "src": "799:15:15",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -177,7 +177,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 2433,
+                    "id": 2407,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "799:7:15",
@@ -190,11 +190,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 2436,
+                  "id": 2410,
                   "mutability": "mutable",
                   "name": "data",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2441,
+                  "scope": 2415,
                   "src": "816:19:15",
                   "stateVariable": false,
                   "storageLocation": "calldata",
@@ -203,7 +203,7 @@
                     "typeString": "bytes"
                   },
                   "typeName": {
-                    "id": 2435,
+                    "id": 2409,
                     "name": "bytes",
                     "nodeType": "ElementaryTypeName",
                     "src": "816:5:15",
@@ -218,16 +218,16 @@
               "src": "766:70:15"
             },
             "returnParameters": {
-              "id": 2440,
+              "id": 2414,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2439,
+                  "id": 2413,
                   "mutability": "mutable",
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2441,
+                  "scope": 2415,
                   "src": "855:6:15",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -236,7 +236,7 @@
                     "typeString": "bytes4"
                   },
                   "typeName": {
-                    "id": 2438,
+                    "id": 2412,
                     "name": "bytes4",
                     "nodeType": "ElementaryTypeName",
                     "src": "855:6:15",
@@ -250,14 +250,14 @@
               ],
               "src": "854:8:15"
             },
-            "scope": 2442,
+            "scope": 2416,
             "src": "741:122:15",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 2443,
+        "scope": 2417,
         "src": "219:646:15"
       }
     ],
@@ -268,7 +268,7 @@
       "absolutePath": "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol",
       "exportedSymbols": {
         "IERC721Receiver": [
-          2442
+          2416
         ]
       },
       "license": "MIT"
@@ -286,7 +286,7 @@
             ".0"
           ]
         },
-        "id": 2426,
+        "id": 2400,
         "name": "PragmaDirective",
         "src": "33:31:15"
       },
@@ -302,17 +302,17 @@
           "contractKind": "interface",
           "fullyImplemented": false,
           "linearizedBaseContracts": [
-            2442
+            2416
           ],
           "name": "IERC721Receiver",
-          "scope": 2443
+          "scope": 2417
         },
         "children": [
           {
             "attributes": {
               "text": " @title ERC721 token receiver interface\n @dev Interface for any contract that wants to support safeTransfers\n from ERC721 asset contracts."
             },
-            "id": 2427,
+            "id": 2401,
             "name": "StructuredDocumentation",
             "src": "66:152:15"
           },
@@ -326,7 +326,7 @@
                 null
               ],
               "name": "onERC721Received",
-              "scope": 2442,
+              "scope": 2416,
               "stateMutability": "nonpayable",
               "virtual": false,
               "visibility": "external"
@@ -336,7 +336,7 @@
                 "attributes": {
                   "text": " @dev Whenever an {IERC721} `tokenId` token is transferred to this contract via {IERC721-safeTransferFrom}\n by `operator` from `from`, this function is called.\n It must return its Solidity selector to confirm the token transfer.\n If any other value is returned or the interface is not implemented by the recipient, the transfer will be reverted.\n The selector can be obtained in Solidity with `IERC721.onERC721Received.selector`."
                 },
-                "id": 2428,
+                "id": 2402,
                 "name": "StructuredDocumentation",
                 "src": "251:485:15"
               },
@@ -347,7 +347,7 @@
                       "constant": false,
                       "mutability": "mutable",
                       "name": "operator",
-                      "scope": 2441,
+                      "scope": 2415,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -360,12 +360,12 @@
                           "stateMutability": "nonpayable",
                           "type": "address"
                         },
-                        "id": 2429,
+                        "id": 2403,
                         "name": "ElementaryTypeName",
                         "src": "767:7:15"
                       }
                     ],
-                    "id": 2430,
+                    "id": 2404,
                     "name": "VariableDeclaration",
                     "src": "767:16:15"
                   },
@@ -374,7 +374,7 @@
                       "constant": false,
                       "mutability": "mutable",
                       "name": "from",
-                      "scope": 2441,
+                      "scope": 2415,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -387,12 +387,12 @@
                           "stateMutability": "nonpayable",
                           "type": "address"
                         },
-                        "id": 2431,
+                        "id": 2405,
                         "name": "ElementaryTypeName",
                         "src": "785:7:15"
                       }
                     ],
-                    "id": 2432,
+                    "id": 2406,
                     "name": "VariableDeclaration",
                     "src": "785:12:15"
                   },
@@ -401,7 +401,7 @@
                       "constant": false,
                       "mutability": "mutable",
                       "name": "tokenId",
-                      "scope": 2441,
+                      "scope": 2415,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -413,12 +413,12 @@
                           "name": "uint256",
                           "type": "uint256"
                         },
-                        "id": 2433,
+                        "id": 2407,
                         "name": "ElementaryTypeName",
                         "src": "799:7:15"
                       }
                     ],
-                    "id": 2434,
+                    "id": 2408,
                     "name": "VariableDeclaration",
                     "src": "799:15:15"
                   },
@@ -427,7 +427,7 @@
                       "constant": false,
                       "mutability": "mutable",
                       "name": "data",
-                      "scope": 2441,
+                      "scope": 2415,
                       "stateVariable": false,
                       "storageLocation": "calldata",
                       "type": "bytes",
@@ -439,17 +439,17 @@
                           "name": "bytes",
                           "type": "bytes"
                         },
-                        "id": 2435,
+                        "id": 2409,
                         "name": "ElementaryTypeName",
                         "src": "816:5:15"
                       }
                     ],
-                    "id": 2436,
+                    "id": 2410,
                     "name": "VariableDeclaration",
                     "src": "816:19:15"
                   }
                 ],
-                "id": 2437,
+                "id": 2411,
                 "name": "ParameterList",
                 "src": "766:70:15"
               },
@@ -460,7 +460,7 @@
                       "constant": false,
                       "mutability": "mutable",
                       "name": "",
-                      "scope": 2441,
+                      "scope": 2415,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "bytes4",
@@ -472,32 +472,32 @@
                           "name": "bytes4",
                           "type": "bytes4"
                         },
-                        "id": 2438,
+                        "id": 2412,
                         "name": "ElementaryTypeName",
                         "src": "855:6:15"
                       }
                     ],
-                    "id": 2439,
+                    "id": 2413,
                     "name": "VariableDeclaration",
                     "src": "855:6:15"
                   }
                 ],
-                "id": 2440,
+                "id": 2414,
                 "name": "ParameterList",
                 "src": "854:8:15"
               }
             ],
-            "id": 2441,
+            "id": 2415,
             "name": "FunctionDefinition",
             "src": "741:122:15"
           }
         ],
-        "id": 2442,
+        "id": 2416,
         "name": "ContractDefinition",
         "src": "219:646:15"
       }
     ],
-    "id": 2443,
+    "id": 2417,
     "name": "SourceUnit",
     "src": "33:833:15"
   },
@@ -506,8 +506,8 @@
     "version": "0.7.4+commit.3f05b770.Emscripten.clang"
   },
   "networks": {},
-  "schemaVersion": "3.3.3",
-  "updatedAt": "2021-03-03T21:32:24.664Z",
+  "schemaVersion": "3.3.4",
+  "updatedAt": "2021-03-11T13:22:34.009Z",
   "devdoc": {
     "details": "Interface for any contract that wants to support safeTransfers from ERC721 asset contracts.",
     "kind": "dev",

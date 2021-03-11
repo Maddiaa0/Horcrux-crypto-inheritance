@@ -20,6 +20,8 @@ class KeyManager {
         this.currentKeys = null;
         this.privateKey = null;
         this.publicKey = null;
+        this.hasSharesGenerated = null;
+        this.currentSharesIndex = null;
 
         // bindings
         this.getPasswordHash = this.getPasswordHash.bind(this);
@@ -29,6 +31,9 @@ class KeyManager {
         this.hash = this.hash.bind(this);
         this.hasher = this.hasher.bind(this);
         this.comparePassAndHash = this.comparePassAndHash.bind(this);
+
+        // methods to run on startup
+        this.initShares();
     }
 
     /**Generate and Store Mnemonic from password
@@ -188,6 +193,18 @@ class KeyManager {
         this.privateKey = keys.privKey;
         this.publicKey = keys.pubKey; 
         return keys;
+    }
+
+    // /**Init Shares 
+    //  * 
+    //  * Check if local storage has any shares generated, if so, then create new shares 
+    //  * and store in local storage.
+    //  * If generated, set the flag to true and the rest of the application will know where to request from
+    //  */
+    initShares(){
+        // check if there are shares stored
+        const sharesStorage = localStorage.getItem("shares");
+        this.hasSharesGenerated = (sharesStorage == null);
     }
 
 }

@@ -14,6 +14,9 @@ contract Recovery is Ownable {
     mapping(address => bool) public shardHolders;
     mapping(address => bool) public blacklisted;
     mapping(address => bool) public confirmed; // trustees can send a transaction from their own account to the contract so that they can show up as confirmed
+
+    mapping(address => uint256) public confirmedBlockNo;
+
     // mapping(address => string) publicKeys;
     // mapping(address => bool) pubKeyGathered;
     uint256 public currentChange; //The block number when a public key was verified, so that the transaction can be found
@@ -31,7 +34,8 @@ contract Recovery is Ownable {
     event TrusteeVerified(
         address indexed account,
         address owner,
-        uint256 previousChange
+        uint256 previousChange,
+        uint256 currentBlock
     );
 
     event TrusteeAdded(
@@ -58,6 +62,10 @@ contract Recovery is Ownable {
         return address(nftContract);
     }
 
+    function getTrustees() external view returns (address[] memory) {
+        return trustees;
+    }
+
     function viewWhoTriggeredRecovery() public view returns (address) {
         return address(trusteeTriggeredRecovery);
     }
@@ -76,8 +84,11 @@ contract Recovery is Ownable {
     function batchAddShardholder(address[] calldata _toAdd) public onlyOwner {
         // Set the provided addresses to be shard holders
         for (uint8 i = 0; i < _toAdd.length; i++) {
-            shardHolders[_toAdd[i]] = true;
-            trustees.push(_toAdd[i]);
+            // check trustee has not been already added
+            if (shardHolders[_toAdd[i]] != true) {
+                shardHolders[_toAdd[i]] = true;
+                trustees.push(_toAdd[i]);
+            }
         }
     }
 
@@ -105,7 +116,13 @@ contract Recovery is Ownable {
     function confirmTrustee() public {
         require(shardHolders[msg.sender], "Sender is not a trustee");
         confirmed[msg.sender] = true;
-        emit TrusteeVerified(msg.sender, this.owner(), currentChange);
+        confirmedBlockNo[msg.sender] = block.number;
+        emit TrusteeVerified(
+            msg.sender,
+            this.owner(),
+            currentChange,
+            block.number
+        );
         currentChange = block.number;
     }
 

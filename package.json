@@ -7,14 +7,17 @@
     "test": "test"
   },
   "dependencies": {
+    "@ethereumjs/tx": "^3.0.2",
     "@openzeppelin/contracts": "^3.4.0",
     "@textile/hub": "^6.0.2",
+    "@truffle/hdwallet-provider": "^1.2.2",
     "abi-decoder": "^2.4.0",
     "bcryptjs": "^2.4.3",
     "chai": "^4.3.0",
     "chai-as-promised": "^7.1.1",
     "chai-bn": "^0.2.1",
     "eccrypto": "^1.1.5",
+    "eth-crypto": "^1.8.0",
     "ethereumjs-util": "^7.0.9",
     "ethereumjs-wallet": "^1.0.1",
     "ethers": "^5.0.31",
@@ -26,7 +29,8 @@
     "ws": "^7.4.3"
   },
   "devDependencies": {
-    "@openzeppelin/test-helpers": "^0.5.10"
+    "@openzeppelin/test-helpers": "^0.5.10",
+    "dotenv": "^8.2.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

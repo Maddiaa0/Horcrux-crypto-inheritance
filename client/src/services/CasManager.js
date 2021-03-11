@@ -3,9 +3,8 @@ import CryptoManager from "./CryptoManager";
 import KeyManager from "./KeyManager";
 
 import {Client, Buckets, UserAuth, PrivateKey, Identity} from "@textile/hub";
-import { BigNumber, providers, utils } from 'ethers'
+// import { providers, utils } from 'ethers'
 import { hashSync } from 'bcryptjs'
-import { keys } from '@material-ui/core/styles/createBreakpoints';
 import cryptoManager from './CryptoManager';
 import keyManager from './KeyManager';
 import eccrypto from "eccrypto";
@@ -58,37 +57,6 @@ class CasManager {
         const CID = await this.ipfs.add(file);
         return CID;
     }
-
-    // async getFileFromCID(_cid){
-    //     const file = await this.ipfs.get(_cid);
-    //     return file;
-    // }
-
-    // big file version of this
-    // async getFileFromCID(_cid){
-    //   for await (const file of this.ipfs.get(_cid)){
-    //     const content = new BufferList()
-    //     for await (const chunk of file.content){
-    //       content.append(chunk)
-    //     }
-
-    //     console.log(content);
-    //     return content.toString();
-    //   }
-    //   return null;
-    // }
-
-    // another failed attempt
-    // async getFileFromCID(_cid){
-    //   for await (const file of this.ipfs.get(_cid)){
-    //     console.log(file);
-    //     console.log(file.content.toString("utf8"))
-    //     for await (const chunk of file.content){
-    //       console.log(chunk.toString("utf8"));
-    //     }
-    //   }
-    //   return null;
-    // }
 
     async getFileFromCID(_cid){
       const res = await axios.get(`http://localhost:8080/ipfs/${_cid}`);
@@ -155,9 +123,13 @@ class CasManager {
 
     /**
      * Run whenever the user is at the storage root, in order to get the ipfs hash of their textile bucket
+     * TODO? identity has already been created and is stored within the local stiorage. At this moment in time the creation is brokwn due to a failure in the
+     * ethers dependancy. All i can do from here is use the curretn vault and not create a new one!
+     * 
      */
     async initTextileForUser(){
         const keys = KeyManager.getKeysFromStorage("password");
+        console.log(keys);
         const addr = ethUtil.privateToAddress(`0x${keys.privKey}`);
         const _ethAddress = `0x${addr.toString("hex")}`;
         console.log(_ethAddress);
@@ -167,7 +139,7 @@ class CasManager {
         if (storedId !== undefined && storedId !== null){
             this.userIdentity = PrivateKey.fromString(storedId);
         } else {
-            await this.generatePrivateKey(_ethAddress);
+            // await this.generatePrivateKey(_ethAddress);
         }
 
         // set up the the client
@@ -192,20 +164,20 @@ class CasManager {
     // }
 
     
-    async signMessage(message){
-        if (this.userIdentity == null){
-            throw new Error("User Identity is not defined");
-        }
+    // async signMessage(message){
+    //     if (this.userIdentity == null){
+    //         throw new Error("User Identity is not defined");
+    //     }
 
-        const mes = Buffer.from(message);
-        const cred = this.userIdentity.sign(mes);
-        return cred;
-    }
+    //     const mes = Buffer.from(message);
+    //     const cred = this.userIdentity.sign(mes);
+    //     return cred;
+    // }
 
-    /**Authorize Dev - get client
-     * 
-     * Returns a textile client object that has the current user signed in?
-     */
+    // /**Authorize Dev - get client
+    //  * 
+    //  * Returns a textile client object that has the current user signed in?
+    //  */
     async authorizeDev(){
         if (this.userIdentity == null){
             throw new Error("User Identity is not defined");
@@ -235,101 +207,100 @@ class CasManager {
 
 
 
-    generateMessageForEntropy(ethereum_address, application_name, secret) {
-        return (
-          '******************************************************************************** \n' +
-          'READ THIS MESSAGE CAREFULLY. \n' +
-          'DO NOT SHARE THIS SIGNED MESSAGE WITH ANYONE OR THEY WILL HAVE READ AND WRITE \n' +
-          'ACCESS TO THIS APPLICATION. \n' +
-          'DO NOT SIGN THIS MESSAGE IF THE FOLLOWING IS NOT TRUE OR YOU DO NOT CONSENT \n' +
-          'TO THE CURRENT APPLICATION HAVING ACCESS TO THE FOLLOWING APPLICATION. \n' +
-          '******************************************************************************** \n' +
-          'The Ethereum address used by this application is: \n' +
-          '\n' +
-          ethereum_address +
-          '\n' +
-          '\n' +
-          '\n' +
-          'By signing this message, you authorize the current application to use the \n' +
-          'following app associated with the above address: \n' +
-          '\n' +
-          application_name +
-          '\n' +
-          '\n' +
-          '\n' +
-          'The hash of your non-recoverable, private, non-persisted password or secret \n' +
-          'phrase is: \n' +
-          '\n' +
-          secret +
-          '\n' +
-          '\n' +
-          '\n' +
-          '******************************************************************************** \n' +
-          'ONLY SIGN THIS MESSAGE IF YOU CONSENT TO THE CURRENT PAGE ACCESSING THE KEYS \n' +
-          'ASSOCIATED WITH THE ABOVE ADDRESS AND APPLICATION. \n' +
-          'AGAIN, DO NOT SHARE THIS SIGNED MESSAGE WITH ANYONE OR THEY WILL HAVE READ AND \n' +
-          'WRITE ACCESS TO THIS APPLICATION. \n' +
-          '******************************************************************************** \n'
-        );
-      }
+    // generateMessageForEntropy(ethereum_address, application_name, secret) {
+    //     return (
+    //       '******************************************************************************** \n' +
+    //       'READ THIS MESSAGE CAREFULLY. \n' +
+    //       'DO NOT SHARE THIS SIGNED MESSAGE WITH ANYONE OR THEY WILL HAVE READ AND WRITE \n' +
+    //       'ACCESS TO THIS APPLICATION. \n' +
+    //       'DO NOT SIGN THIS MESSAGE IF THE FOLLOWING IS NOT TRUE OR YOU DO NOT CONSENT \n' +
+    //       'TO THE CURRENT APPLICATION HAVING ACCESS TO THE FOLLOWING APPLICATION. \n' +
+    //       '******************************************************************************** \n' +
+    //       'The Ethereum address used by this application is: \n' +
+    //       '\n' +
+    //       ethereum_address +
+    //       '\n' +
+    //       '\n' +
+    //       '\n' +
+    //       'By signing this message, you authorize the current application to use the \n' +
+    //       'following app associated with the above address: \n' +
+    //       '\n' +
+    //       application_name +
+    //       '\n' +
+    //       '\n' +
+    //       '\n' +
+    //       'The hash of your non-recoverable, private, non-persisted password or secret \n' +
+    //       'phrase is: \n' +
+    //       '\n' +
+    //       secret +
+    //       '\n' +
+    //       '\n' +
+    //       '\n' +
+    //       '******************************************************************************** \n' +
+    //       'ONLY SIGN THIS MESSAGE IF YOU CONSENT TO THE CURRENT PAGE ACCESSING THE KEYS \n' +
+    //       'ASSOCIATED WITH THE ABOVE ADDRESS AND APPLICATION. \n' +
+    //       'AGAIN, DO NOT SHARE THIS SIGNED MESSAGE WITH ANYONE OR THEY WILL HAVE READ AND \n' +
+    //       'WRITE ACCESS TO THIS APPLICATION. \n' +
+    //       '******************************************************************************** \n'
+    //     );
+    //   }
     
-      getSigner = async () => {
-        if (!window.ethereum) {
-          throw new Error(
-            'Ethereum is not connected. Please download Metamask from https://metamask.io/download.html'
-          );
-        }
+    //   getSigner = async () => {
+    //     if (!window.ethereum) {
+    //       throw new Error(
+    //         'Ethereum is not connected. Please download Metamask from https://metamask.io/download.html'
+    //       );
+    //     }
     
-        console.debug('Initializing web3 provider...');
-        // @ts-ignore
-        const provider = new providers.Web3Provider(window.ethereum);
-        const signer = provider.getSigner();
-        return signer
-      }
+    //     console.debug('Initializing web3 provider...');
+    //     // const provider = new providers.Web3Provider(window.ethereum);
+    //     // const signer = provider.getSigner();
+    //     // return signer
+    //   }
     
-      async getAddressAndSigner(ethAddress) {
-        const signer = await this.getSigner()
-        return {address: ethAddress, signer}
-      }
-      generatePrivateKey = async ethAddress => {
-          console.log(ethAddress)
-        const metamask = await this.getAddressAndSigner(ethAddress)
-        console.log(metamask.address);
-        // avoid sending the raw secret by hashing it first
-        const secret = hashSync(KeyManager.privateKey, 10)
-        const message = this.generateMessageForEntropy(metamask.address, 'user-textile-bucket-key', secret)
-        const signedText = await metamask.signer.signMessage(message);
-        const hash = utils.keccak256(signedText);
-        console.log(hash);
-        if (hash === null) {
-          throw new Error('No account is provided. Please provide an account to this application.');
-        }
-        // The following line converts the hash in hex to an array of 32 integers.
+    //   async getAddressAndSigner(ethAddress) {
+    //     // const signer = await this.getSigner()
+    //     // return {address: ethAddress, signer}
+    //   }
+    //   generatePrivateKey = async ethAddress => {
+    //       console.log(ethAddress)
+    //     const metamask = await this.getAddressAndSigner(ethAddress)
+    //     console.log(metamask.address);
+    //     // avoid sending the raw secret by hashing it first
+    //     const secret = hashSync(KeyManager.privateKey, 10)
+    //     const message = this.generateMessageForEntropy(metamask.address, 'user-textile-bucket-key', secret)
+    //     const signedText = await metamask.signer.signMessage(message);
+    //     const hash =  ethUtil.keccak256(signedText);// utils.keccak256(signedText);
+    //     console.log(hash);
+    //     if (hash === null) {
+    //       throw new Error('No account is provided. Please provide an account to this application.');
+    //     }
+    //     // The following line converts the hash in hex to an array of 32 integers.
        
-        const array = hash
-          .replace('0x', '')
-          .match(/.{2}/g)
-          .map((hexNoPrefix) => new ethUtil.BN('0x' + hexNoPrefix).toNumber())
+    //     const array = hash
+    //       .replace('0x', '')
+    //       .match(/.{2}/g)
+    //       .map((hexNoPrefix) => new ethUtil.BN('0x' + hexNoPrefix).toNumber())
         
-        if (array.length !== 32) {
-          throw new Error('Hash of signature is not the correct size! Something went wrong!');
-        }
-        const identity = PrivateKey.fromRawEd25519Seed(Uint8Array.from(array))
-        console.log(identity.toString());
-        this.storeUserIdentity(identity.toString());
-        // Your app can now use this identity for generating a user Mailbox, Threads, Buckets, etc
-        this.userIdentity = identity;
-        return identity
-      }
+    //     if (array.length !== 32) {
+    //       throw new Error('Hash of signature is not the correct size! Something went wrong!');
+    //     }
+    //     const identity = PrivateKey.fromRawEd25519Seed(Uint8Array.from(array))
+    //     console.log(identity.toString());
+    //     this.storeUserIdentity(identity.toString());
+    //     // Your app can now use this identity for generating a user Mailbox, Threads, Buckets, etc
+    //     this.userIdentity = identity;
+    //     return identity
+    //   }
 
 
-      async storeUserIdentity(identity){
-          if (typeof identity !== "string" && identity == null){
-            throw new Error("String identity required");
-          }
+    //   async storeUserIdentity(identity){
+    //       if (typeof identity !== "string" && identity == null){
+    //         throw new Error("String identity required");
+    //       }
 
-          localStorage.setItem("identity", identity);
-      }
+    //       localStorage.setItem("identity", identity);
+    //   }
 
       async getUserIdentityFromStorage(){
         const id = localStorage.getItem("identity");
@@ -433,7 +404,7 @@ class CasManager {
       }
 
 
-      // test decrypt
+      //test decrypt
 
 }
 

@@ -138,7 +138,7 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "pragma solidity ^0.7.4;\r\n\r\ninterface IShardManager {\r\n    // Event to store if recovery contracts have been created etc.\r\n    event ShardRecoveryStep(\r\n        address indexed ownerAddress,\r\n        address contractAddress,\r\n        uint256 step\r\n    );\r\n\r\n    /** Create shard contract\r\n     *\r\n     * Any user wishing to initiate on chain recovery can interact with this contract in order to trigger an\r\n     * on chain recovery mechanism\r\n     */\r\n    function createRecoveryContract(\r\n        address _recoveryContractOwner,\r\n        uint256 _threshold\r\n    ) external;\r\n\r\n    //TODO: Modify so that the user can let the others know if the before death / after death protocol is to be used\r\n    function updateRecoveryState(\r\n        address _contractOwner,\r\n        address _sender,\r\n        uint256 _step\r\n    ) external;\r\n\r\n    /**\r\n     *\r\n     */\r\n    function checkRecoveryContractAddress(address _addressToCheck)\r\n        external\r\n        returns (address);\r\n\r\n    function checkRecoveryContractState(address _addressToCheck)\r\n        external\r\n        returns (uint256);\r\n\r\n    /**\r\n        @dev Is called by the child recovery contract to update the owner of a recovery contract\r\n     */\r\n    function setNewContractOwner(\r\n        address _newOwner,\r\n        address _currentOwner,\r\n        address _childContractAddr\r\n    ) external;\r\n}\r\n",
-  "sourcePath": "C:\\Users\\schee\\Documents\\Uni\\FYP\\Project\\contracts\\IShardManager.sol",
+  "sourcePath": "C:/Users/schee/Documents/Uni/FYP/Project/contracts/IShardManager.sol",
   "ast": {
     "absolutePath": "/C/Users/schee/Documents/Uni/FYP/Project/contracts/IShardManager.sol",
     "exportedSymbols": {
@@ -1429,7 +1429,7 @@
   },
   "networks": {},
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-03-08T11:55:06.181Z",
+  "updatedAt": "2021-03-11T13:26:16.428Z",
   "devdoc": {
     "kind": "dev",
     "methods": {

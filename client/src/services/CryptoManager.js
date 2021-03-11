@@ -7,12 +7,24 @@ import {hdkey} from "ethereumjs-wallet";
 import { encrypt } from '@textile/hub';
 import eccrypto from "eccrypto";
 import fs from "fs";
+import slip39 from "slip39";
+import { userInfo } from 'os';
+import CASManager from './CasManager';
+import CryptoJS from "crypto-js";
+import keyManager from './KeyManager';
+
+// import EthCrypto from 'eth-crypto';
+
+
+import secrets from "secrets.js";
+
 
 
 class CryptoManager {
 
     constructor(){
         this.generateMnemomic = this.generateMnemomic.bind(this);
+        
     }
 
     generateMnemomic(){
@@ -140,7 +152,14 @@ class CryptoManager {
 
 
     async assymetricEncrypt(publicKey, data){
-        return await eccrypto.encrypt(Buffer.from(publicKey, "hex"), Buffer.from(data));
+        var buffer;
+        if (typeof publicKey === "string"){
+            buffer = Buffer.from(publicKey, "hex");
+        } else if (Buffer.isBuffer(publicKey)) {
+            buffer = publicKey
+        }
+        // return await eccrypto.encrypt(Buffer.from(publicKey, "hex"), Buffer.from(data));
+        return await eccrypto.encrypt(buffer, Buffer.from(data));
     }
 
     async assymetricDecrypt(privateKey, data){
@@ -150,6 +169,85 @@ class CryptoManager {
             return v.type == "Buffer" ? Buffer.from(v.data, "hex") : v
         });
         return (await eccrypto.decrypt(Buffer.from(privateKey, "hex"), actualData)).toString();
+    }
+
+
+    /**
+     * ======================================================================================================================
+     * The following section deals with creating and distributing shards across the network
+     * 
+     * At the moment all shares will be encoded as groups of similar sizes. This method will be adjusted in future versions
+     * to include properly segmented groups.
+     * ======================================================================================================================
+     */
+    async createSharesAndKeepInStorage(mnemonic, threshold, password="password"){
+        // create shares
+        const secretHex = await secrets.str2hex(mnemonic);
+        const shares = await secrets.share(secretHex, 10, 3);
+        
+        // convert to JSON so it can be strinified and stored reliably
+        const sharesObj = {
+            shares
+        }
+
+        // encrypt and store
+        const encrypted = CryptoJS.AES.encrypt(JSON.stringify(sharesObj), password);
+        localStorage.setItem("shares", encrypted);
+    }
+
+
+    async getSharesFromStorage(password="password"){
+        // get from storage and decrypt
+        const encryptedShares = localStorage.getItem("shares");
+        const decryptedBytes = CryptoJS.AES.decrypt(encryptedShares, password);
+        
+        // get JSON string
+        const decrypted = decryptedBytes.toString(CryptoJS.enc.Utf8)
+        
+        // return from JSON object
+        return JSON.parse(decrypted).shares;
+    }
+
+    async createShardsBasedOnThreshold(){
+
+    }
+
+
+    /**
+     * TODO: index to be stored inside the recovery smart contract
+     * @param {Buffer} publicKey 
+     * @param {int} index
+     * @param {String} addressToProtect
+     * 
+     * @returns {String} ipfs-CID of share 
+     */
+    async mintNewShard(publicKey, index, addressToProtect){
+        // TODO: should the index be stored offline, or should it be stored with the other shards
+        const shares = await this.getSharesFromStorage("password");
+        console.log(shares);
+
+        const keys = keyManager.getKeysFromStorage("password");
+        console.log(keys.pubKey);   
+        console.log(Buffer.from(keys.pubKey, "hex"))
+
+        const personalShare = {
+            share: shares[index],
+            user: addressToProtect,
+            type: "recoveryShare"
+        }
+        console.log(personalShare)
+        console.log(publicKey)
+        // const compressedKey = EthCrypto.publicKey.compress(publicKey.toString("hex"));
+        console.log(publicKey);
+        const encryptedShare = await this.assymetricEncrypt(publicKey, JSON.stringify(personalShare));
+        console.log(encryptedShare);
+        // const cid = CASManager.addFileToIPFS(encryptedShare);
+        // return cid;
+    }
+
+
+    async readTrusteesPublicKey(){
+
     }
 
 

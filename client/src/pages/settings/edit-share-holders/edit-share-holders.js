@@ -93,6 +93,19 @@ function EditShardHolders(){
         }
     }
 
+    /**
+     * 
+     */
+    function sendShardsToSelectedHolders(){
+        // todo: remove from this testing state, just checking the currently selected transaction
+        if (selectedShardholders.length < 1) {
+            alert("No shardholder selected");
+            return;
+        }
+        const selected = selectedShardholders[0];
+        const usersPubkey = RecoveryContractManager.recoverPublicKeyFromUser(selected);
+    }
+
     function openSnackbar(){
         setSnackBarOpen(true);
     }
@@ -135,7 +148,7 @@ function EditShardHolders(){
                         onConfirmed={addAddressesToBlacklist}
                     />
                     <Tooltip arrow title="Only verified shareholders can be sent shards" placement="top">
-                        <Button size="small" variant="contained">Send Shard</Button>
+                        <Button size="small" variant="contained" onClick={() => sendShardsToSelectedHolders()}>Send Shard</Button>
                     </Tooltip>
                 </CardActions>
             </Card>

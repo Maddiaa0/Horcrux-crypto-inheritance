@@ -35,7 +35,7 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "// SPDX-License-Identifier: UNLICENSED\r\npragma solidity ^0.7.4;\r\n\r\ninterface IShardNFT {\r\n    /**Sends a token NFT to a given address\r\n     *\r\n     *\r\n     */\r\n    function distributeShard(address _shardOwner, string memory tokenURI)\r\n        external\r\n        returns (uint256);\r\n}\r\n",
-  "sourcePath": "C:\\Users\\schee\\Documents\\Uni\\FYP\\Project\\contracts\\IShardNFT.sol",
+  "sourcePath": "C:/Users/schee/Documents/Uni/FYP/Project/contracts/IShardNFT.sol",
   "ast": {
     "absolutePath": "/C/Users/schee/Documents/Uni/FYP/Project/contracts/IShardNFT.sol",
     "exportedSymbols": {
@@ -371,7 +371,7 @@
   },
   "networks": {},
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-03-08T11:55:06.190Z",
+  "updatedAt": "2021-03-11T13:26:16.436Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},
