@@ -241,8 +241,9 @@ class CryptoManager {
         console.log(publicKey);
         const encryptedShare = await this.assymetricEncrypt(publicKey, JSON.stringify(personalShare));
         console.log(encryptedShare);
-        // const cid = CASManager.addFileToIPFS(encryptedShare);
-        // return cid;
+        console.log(JSON.stringify(encryptedShare));
+        const cid = await CASManager.addFileToIpds(JSON.stringify(encryptedShare));
+        return cid;
     }
 
 

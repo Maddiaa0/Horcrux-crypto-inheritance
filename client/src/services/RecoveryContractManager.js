@@ -16,6 +16,10 @@ import KeyManager from "./KeyManager";
 import cryptoManager from "./CryptoManager";
 import keyManager from "./KeyManager";
 
+// helper function
+var _secp256k = require('secp256k1');
+
+
 /**Recovery Contract Manager
  * 
  * The Recovery Contract Manager is created to interface with the recovery smart contract found within the blockchain for each account.
@@ -369,19 +373,42 @@ class RecoveryContractManager{
         const sender = new EthereumTx(testArr, {common}).getSenderAddress();
         console.log(sender.toString("hex"));
 
+        // convert to a compresed pub key to be used in asym encrypt
+       const compressedKey = convertToCompressedPublicKey(pubKeya);
+
         // perform encryption to encode with derived public key
-        const ipfsCID = await CryptoManager.mintNewShard(pubKeya, 1, this.web3.currentProvider.selectedAddress);
-        console.log(ipfsCID);
-
+        const ipfsCID = await CryptoManager.mintNewShard(compressedKey, 1, this.web3.currentProvider.selectedAddress);
+        console.log(ipfsCID.path)
+        const ipfsHex = this.web3.utils.utf8ToHex(ipfsCID.path)
+        console.log(address);
         // call contract to mint this new recovery nft
-        // await this.recoveryContract.methods.sendShardToShardOwner(address, ipfsCID);
-
+        await this.recoveryContract.methods.sendShardToShardOwner(address, ipfsCID.path).send({
+            from: this.web3.currentProvider.selectedAddress
+        });
     }
 }
 
 const recoveryContractManager = new RecoveryContractManager();
 export default recoveryContractManager;
 
+
+function convertToCompressedPublicKey(longPubKey){
+    var hexKey = uint8ArrayToHex(longPubKey);
+    hexKey = "04" + hexKey;
+    const arrKey = Buffer.from(hexKey, "hex");
+    const compressedKey = _secp256k.publicKeyConvert(arrKey, true);
+    console.log(compressedKey);
+    console.log(uint8ArrayToHex(compressedKey));
+    return compressedKey;
+}
+
+function uint8ArrayToHex(arr) {
+    return Buffer.from(arr).toString('hex');
+}
+
+function hexToUnit8Array(str) {
+    return new Uint8Array(Buffer.from(str, 'hex'));
+}
 
 
 /**
