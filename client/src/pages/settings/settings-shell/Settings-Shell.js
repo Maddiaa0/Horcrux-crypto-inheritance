@@ -64,7 +64,7 @@ function SettingsShell(){
                 }}
             >
                 <Switch>
-                    <Route exact path="/settings" render={() => <SettingsMenu/>}/>
+                    {/* <Route exact path="/settings" render={() => <SettingsMenu/>}/> */}
                     <Route path="/settings/edit-shardholders" render={() => <EditShardholders/>}/>
                     <Route path="/settings/keys" render={() => <CycleKeys/>}/>
                 </Switch>

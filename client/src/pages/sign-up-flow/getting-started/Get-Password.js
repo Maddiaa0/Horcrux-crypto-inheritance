@@ -27,7 +27,8 @@ function GettingStarted(){
     const goToNext = evt => {
         evt.preventDefault();
         if (password === confirmPassword){
-            createAccountAndEncrypt(password);
+            //TODO: uncomment this
+            // createAccountAndEncrypt(password);
             history.push("/setup/phrase");
         }   
     }
@@ -59,20 +60,22 @@ function GettingStarted(){
                     <TextValidator 
                         id="password-create" 
                         name="password-create"  
-                        label="Password" 
+                        label="Password"
+                        type="password" 
                         variant="outlined"
-                        validators= {passwordValidatorMessages.passwordsMatch}
-                        errorMessages={passwordValidatorMessages.passwordsMatchErrorMessage}
+                        // validators= {passwordValidatorMessages.passwordsMatch}
+                        // errorMessages={passwordValidatorMessages.passwordsMatchErrorMessage}
                         value={password}
                         onChange={(evt) => setPassword(evt.target.value)}
                     />
                     <TextValidator 
                         id="password-confirm" 
-                        name="password-confirm"  
+                        name="password-confirm"
+                        type="password"
                         label="Confirm Password" 
                         variant="outlined"
-                        validators= {passwordValidatorMessages.passwordsMatch}
-                        errorMessages={passwordValidatorMessages.passwordsMatchErrorMessage}
+                        // validators= {passwordValidatorMessages.passwordsMatch}
+                        // errorMessages={passwordValidatorMessages.passwordsMatchErrorMessage}
                         value={confirmPassword}
                         onChange={evt => setConfirmPassword(evt.target.value)}
                     />

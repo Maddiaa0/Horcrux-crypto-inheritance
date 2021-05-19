@@ -1,5 +1,3 @@
-import ElementLib from '@transmute/element-lib'
-import { bip39 } from '@transmute/element-lib/src/crypto';
 import { toEthereumAddress } from 'did-jwt';
 import Crypto from "crypto";
 
@@ -11,12 +9,12 @@ import slip39 from "slip39";
 import { userInfo } from 'os';
 import CASManager from './CasManager';
 import CryptoJS from "crypto-js";
-import keyManager from './KeyManager';
+import * as eccryptoJS from "eccrypto-js";
 
 // import EthCrypto from 'eth-crypto';
-
-
 import secrets from "secrets.js";
+
+const bip39 = require("bip39");
 
 
 
@@ -28,7 +26,7 @@ class CryptoManager {
     }
 
     generateMnemomic(){
-        let mnem = ElementLib.MnemonicKeySystem.generateMnemonic();
+        let mnem = bip39.generateMnemonic();
         return mnem;
     }
 
@@ -44,11 +42,32 @@ class CryptoManager {
         const root = hdkey.fromMasterSeed(seed);
         //NOTE: 60 is specific to eth, check if there is a sidetree unique version
         const hdPath = `m/44'/60'/0'/0/${index}`;
-        const addrNode = root.derive(hdPath);
+        const addrNode = root.derivePath(hdPath);
         // return addrNode.privateKey;
         return {
-            pubKey: addrNode.publicKey.toString("hex"),
-            privKey: addrNode.privateKey.toString("hex")
+            pubKey: addrNode._hdkey._publicKey.toString("hex"),
+            privKey: addrNode._hdkey._privateKey.toString("hex")
+        };
+    }
+
+    /**Get Public Private for Access Groups
+     * 
+     * When uploading files, this method chooses the account encryption keys to use
+     * from BIP32 to encrypt files.
+     * 
+     * @param {String} mnemonic 
+     * @param {Number} index 
+     * @returns 
+     */
+    async getPubPrivForAccessGroups(mnemonic, index){
+        const seed = await bip39.mnemonicToSeed(mnemonic);
+        const root = hdkey.fromMasterSeed(seed);
+        const hdPath = `m/44/60'/${index}'/0`;
+        const addrNode = root.derivePath(hdPath);
+
+        return {
+            pubKey: addrNode._hdkey._publicKey.toString("hex"),
+            privKey: addrNode._hdkey._privateKey.toString("hex")
         };
     }
 
@@ -155,20 +174,37 @@ class CryptoManager {
         var buffer;
         if (typeof publicKey === "string"){
             buffer = Buffer.from(publicKey, "hex");
+        }else if (!Buffer.isBuffer(publicKey)){
+            buffer = Buffer.from(publicKey);
         } else if (Buffer.isBuffer(publicKey)) {
             buffer = publicKey
-        }
+        } 
+
+        console.log(Buffer.isBuffer(buffer));
         // return await eccrypto.encrypt(Buffer.from(publicKey, "hex"), Buffer.from(data));
-        return await eccrypto.encrypt(buffer, Buffer.from(data));
+        return await eccrypto.encrypt(buffer, Buffer.from(JSON.stringify(data)));
+        // return await eccryptoJS.encrypt(buffer, Buffer.from(data));
     }
 
     async assymetricDecrypt(privateKey, data){
         // read and parse the encrypted data so that it can be interpreted
+        // const g = JSON.stringify(data);
+        // const actualData = JSON.parse(g, (k,v) => {
+        //     return v.type === "Buffer" ? Buffer.from(v.data, "hex") : v
+        // });
+        // console.log(Buffer.from(privateKey, "hex"));
+        // return (await eccrypto.decrypt(Buffer.from(privateKey, "hex"), data)).toString();
         const g = JSON.stringify(data);
-        const actualData = JSON.parse(g, (k,v) => {
-            return v.type == "Buffer" ? Buffer.from(v.data, "hex") : v
+        const actualData = JSON.parse(g, (k,v) => { 
+            return v.type === "Buffer" ? Buffer.from(v.data, "hex") : v
         });
         return (await eccrypto.decrypt(Buffer.from(privateKey, "hex"), actualData)).toString();
+    }
+
+
+    async asymDecryptFiles(privateKey, data){
+        console.log(Buffer.from(privateKey, "hex"));
+        return (await eccrypto.decrypt(Buffer.from(privateKey, "hex"), data)).toString();
     }
 
 
@@ -226,10 +262,6 @@ class CryptoManager {
         const shares = await this.getSharesFromStorage("password");
         console.log(shares);
 
-        const keys = keyManager.getKeysFromStorage("password");
-        console.log(keys.pubKey);   
-        console.log(Buffer.from(keys.pubKey, "hex"))
-
         const personalShare = {
             share: shares[index],
             user: addressToProtect,
@@ -237,18 +269,32 @@ class CryptoManager {
         }
         console.log(personalShare)
         console.log(publicKey)
-        // const compressedKey = EthCrypto.publicKey.compress(publicKey.toString("hex"));
-        console.log(publicKey);
         const encryptedShare = await this.assymetricEncrypt(publicKey, JSON.stringify(personalShare));
         console.log(encryptedShare);
         console.log(JSON.stringify(encryptedShare));
-        const cid = await CASManager.addFileToIpds(JSON.stringify(encryptedShare));
+        
+        // create an object to comply with the ERC721 metadata standard
+        const metadata = {
+            "name": "Recovery Share",
+            "description": `Share to protect ${addressToProtect}`,
+            "data": encryptedShare
+        };
+
+        console.log(metadata);
+        console.log(JSON.stringify(metadata));
+        
+        const cid = await CASManager.addFileToIpds(JSON.stringify(metadata));
         return cid;
     }
 
-
-    async readTrusteesPublicKey(){
-
+    /**Recombine for secret
+     * 
+     * Takes an array of shares as input and returns the seed phrase of the user as output
+     * 
+     * @param {String[]} shares 
+     */
+    recombineForSecret(shares){
+        return secrets.hex2str(secrets.combine(shares));
     }
 
 

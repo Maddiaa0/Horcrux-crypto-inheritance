@@ -170,7 +170,7 @@ contract("Recovery Contract", accounts => {
      )
 
       it("Does not allow non trustees / not contract owner to trigger a recovery event", async function(){
-          await expectRevert(deployedRecovery.triggerRecoveryEvent("Test", {from: accountBob}), "Not a valid Trustee");
+          await expectRevert(deployedRecovery.triggerRecoveryEvent("QmbKi2jXuKCdy4BBKMF8zMopvCS3JHsCKP48ZA11xd75Bs", {from: accountBob}), "Not a valid Trustee");
       });
 
       it("Initialises the address initialising recovery to be 0x0", async function(){
@@ -185,7 +185,7 @@ contract("Recovery Contract", accounts => {
         expect(isShardHolder).to.be.equal(true);
 
         // Make alice send out a recovery event with a particular payload
-        await deployedRecovery.triggerRecoveryEvent("Test", {from: accountAlice});
+        await deployedRecovery.triggerRecoveryEvent("QmbKi2jXuKCdy4BBKMF8zMopvCS3JHsCKP48ZA11xd75Bs", {from: accountAlice});
         
         // Check that the recovery NFT has been issued to alice the trustees account
         const NFTContractAddress = await deployedRecovery.getNFTAddress();
@@ -195,7 +195,7 @@ contract("Recovery Contract", accounts => {
         expect(aliceBalance).to.be.a.bignumber.equal(new BN(1)); 
         
         const aliceToken = await NFTInstance.tokenURI(1);
-        expect(aliceToken).to.be.equal("Test");
+        expect(aliceToken).to.be.equal("QmbKi2jXuKCdy4BBKMF8zMopvCS3JHsCKP48ZA11xd75Bs");
       });
 
       it("Sets the address initiating recovery to be that who initialised recovery", async function(){
@@ -205,7 +205,7 @@ contract("Recovery Contract", accounts => {
         expect(isShardHolder).to.be.equal(true);
 
         // Make alice send out a recovery event with a particular payload
-        await deployedRecovery.triggerRecoveryEvent("Test", {from: accountAlice});
+        await deployedRecovery.triggerRecoveryEvent("QmbKi2jXuKCdy4BBKMF8zMopvCS3JHsCKP48ZA11xd75Bs", {from: accountAlice});
 
         // Check that the contract is in recovery mode and has been issued
         const triggeredRecovery = await deployedRecovery.viewWhoTriggeredRecovery({from: accountBob});
@@ -222,7 +222,7 @@ contract("Recovery Contract", accounts => {
     });
 
     it("Does not allow user to respond to recovery event if recovery has not been initilaised", async function(){
-        await expectRevert(deployedRecovery.sendShardToRecoveryInitialiser("Test"), "Recovery not yet initialised");
+        await expectRevert(deployedRecovery.sendShardToRecoveryInitialiser("QmbKi2jXuKCdy4BBKMF8zMopvCS3JHsCKP48ZA11xd75Bs"), "Recovery not yet initialised");
     });
 
     it("Does not allow untrusteed user to send their own recovery NFT", async function(){
@@ -232,10 +232,10 @@ contract("Recovery Contract", accounts => {
         expect(isShardHolder).to.be.equal(true);
 
         // Make alice send out recovery
-        await deployedRecovery.triggerRecoveryEvent("Test", {from: accountAlice});
+        await deployedRecovery.triggerRecoveryEvent("QmbKi2jXuKCdy4BBKMF8zMopvCS3JHsCKP48ZA11xd75Bs", {from: accountAlice});
 
         // bob is not allowed to send his recovery NFT
-        await expectRevert(deployedRecovery.sendShardToRecoveryInitialiser("Test", {from: accountBob}), "Not a valid Trustee");
+        await expectRevert(deployedRecovery.sendShardToRecoveryInitialiser("QmbKi2jXuKCdy4BBKMF8zMopvCS3JHsCKP48ZA11xd75Bs", {from: accountBob}), "Not a valid Trustee");
     });
 
     it("Successfully allows trusted user to send recovery NFT", async function(){
@@ -248,7 +248,7 @@ contract("Recovery Contract", accounts => {
         expect(isBobShardHolder).to.be.equal(true);
 
         // Make alice send out a recovery event with a particular payload
-        await deployedRecovery.triggerRecoveryEvent("Test", {from: accountAlice});
+        await deployedRecovery.triggerRecoveryEvent("QmbKi2jXuKCdy4BBKMF8zMopvCS3JHsCKP48ZA11xd75Bs", {from: accountAlice});
         
         // Check that the recovery NFT has been issued to alice the trustees account
         const NFTContractAddress = await deployedRecovery.getNFTAddress();
@@ -258,7 +258,7 @@ contract("Recovery Contract", accounts => {
         expect(bobBalance).to.be.a.bignumber.equal(new BN(1)); 
         
         const aliceToken = await NFTInstance.tokenURI(1);
-        expect(aliceToken).to.be.equal("Test");
+        expect(aliceToken).to.be.equal("QmbKi2jXuKCdy4BBKMF8zMopvCS3JHsCKP48ZA11xd75Bs");
 
         // bob sends his shard token to alice
         await deployedRecovery.sendShardToRecoveryInitialiser("Returned From Bob", {from: accountBob});

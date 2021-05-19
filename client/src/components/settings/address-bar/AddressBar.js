@@ -12,8 +12,8 @@ function AddressBar(props){
     return (
         <div onClick={onClick} className={`AddressBar ${selected ? "AddressBar-selected" : ""}`}>
             {addressData.address} 
-            {addressData.verified && <Tooltip title="User has confimed they wish to be a shardholder" placement="top" arrow><Emoji symbol="✔️" label="verified"/></Tooltip>} 
-            <Tooltip arrow title="User is in possession of shard" placement="top"><Emoji symbol="📬" label="Shard Send"/></Tooltip>
+            {addressData.verified ? <Tooltip title="User has confimed they wish to be a shardholder" placement="top" arrow><Emoji symbol="✔️" label="verified"/></Tooltip> : <Tooltip title="User has NOT confirmed to be a shardholder" placement="top" arrow><Emoji symbol="❌" label="verified"/></Tooltip>} 
+            {addressData.sentShard && <Tooltip arrow title="User is in possession of shard" placement="top"><Emoji symbol="📬" label="Shard Send"/></Tooltip>}
         </div>
     )
 }

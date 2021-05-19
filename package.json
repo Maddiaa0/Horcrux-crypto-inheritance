@@ -1,48 +1,9 @@
 {
-  "name": "project",
-  "version": "1.0.0",
-  "description": "��#\u0000 \u0000F\u0000Y\u0000P\u0000\r\u0000 \u0000",
-  "main": "truffle-config.js",
-  "directories": {
-    "test": "test"
-  },
   "dependencies": {
-    "@ethereumjs/tx": "^3.0.2",
-    "@openzeppelin/contracts": "^3.4.0",
-    "@textile/hub": "^6.0.2",
-    "@truffle/hdwallet-provider": "^1.2.2",
-    "abi-decoder": "^2.4.0",
-    "bcryptjs": "^2.4.3",
-    "chai": "^4.3.0",
-    "chai-as-promised": "^7.1.1",
-    "chai-bn": "^0.2.1",
-    "eccrypto": "^1.1.5",
-    "eth-crypto": "^1.8.0",
-    "ethereumjs-util": "^7.0.9",
-    "ethereumjs-wallet": "^1.0.1",
-    "ethers": "^5.0.31",
-    "ethr-did": "^1.3.0",
-    "isomorphic-ws": "^4.0.1",
-    "random-key": "^0.3.2",
-    "react-router-dom": "^5.2.0",
-    "solc": "^0.8.0",
-    "ws": "^7.4.3"
+    "@openzeppelin/contracts": "^3.4.1",
+    "chai-as-promised": "^7.1.1"
   },
   "devDependencies": {
-    "@openzeppelin/test-helpers": "^0.5.10",
-    "dotenv": "^8.2.0"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/cheethas/FYP.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/cheethas/FYP/issues"
-  },
-  "homepage": "https://github.com/cheethas/FYP#readme"
+    "@openzeppelin/test-helpers": "^0.5.10"
+  }
 }

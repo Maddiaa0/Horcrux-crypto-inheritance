@@ -41,11 +41,12 @@ function InitSocialRecovery(){
         <div>
             <SignUpTitle>Social recovery</SignUpTitle>
             <SignUpParagraph>
-                By opting in to social recovery, a number of delegated Ethereum addresses will receive a shard of you recovery seed!
+                By opting in to social recovery, a number of delegated Ethereum addresses will receive a shard of you recovery seed! 
                 <br></br>
-                In the event that you lose your recovery seed, or after death, you can instruct your trustees, to combine a number
-                <br></br>
-                of shares that will reveal to them your recovery seed!
+                In the event that you lose your recovery seed, or after death, you can instruct your trustees to combine a number
+                of shares that will regenerate your recovery seed.
+                <br/><br/>
+                Don't worry recovery shards are encrypted such that only the trustee you send it too will be able to open or interact with it.
             </SignUpParagraph>
 
             <Row>
@@ -65,7 +66,7 @@ function InitSocialRecovery(){
 
 
             <div>
-                In the input boxes, below, enter the ethereum addresses you wish to currently use as your shard trustees!
+                In the input boxes, below, enter the ethereum addresses you wish to use as your shard trustees!
             </div>
             <AddShardholders/>
     

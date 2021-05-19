@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from "react";
 
 // components
-import { Button, TextField } from "@material-ui/core";
+import { AppBar, Button, Grid, Hidden, TextField, Toolbar, Typography } from "@material-ui/core";
 import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";
 
 // constants
@@ -18,11 +18,12 @@ import { isEthereumAddress } from "../../helpers/utils/utils";
  */
 function VerifyPage(){
     const [ethAddress, setEthAddress] = useState("");
-    const [web3, setWeb3] = useState(null);
+    const [currentAddress, setCurrentAddress] = useState(null);
 
     useEffect(() => {
         async function getWeb(){
-            setWeb3(await getWeb3());
+            const localWeb3 = await getWeb3();
+            setCurrentAddress(localWeb3.currentProvider.selectedAddress)
         }
 
         getWeb();
@@ -35,22 +36,21 @@ function VerifyPage(){
     async function validateUser(evt){
         evt.preventDefault();
         // check that there is an address inside metamask
-        console.log(web3);
-        if (web3.currentProvider.selectedAddress === null){
+        if (currentAddress === null){
             alert("Please connect with metamask to continue");
         }
 
-        if (ethAddress != "" && isEthereumAddress(ethAddress)){
+        if (ethAddress !== "" && isEthereumAddress(ethAddress)){
             await RecoveryContractManager.verifyRecoveryContractFromAddress(ethAddress);
         }
     }
 
     async function checkIfTrustee(){
-        if (web3.currentProvider.selectedAddress === null){
+        if (currentAddress === null){
             alert("Please connect with metamask to continue");
         }
 
-        if (ethAddress != "" && isEthereumAddress(ethAddress)){
+        if (ethAddress !== "" && isEthereumAddress(ethAddress)){
             const isTrustee = await RecoveryContractManager.isUserATrustee(ethAddress);
             if (isTrustee) alert("You are a trustee for this user");
             else alert("You are not a trustee for this user");
@@ -58,8 +58,45 @@ function VerifyPage(){
     }
 
     return (
-        <div>
-            Verify Recovery
+        <>
+      <AppBar color="primary" position="sticky" elevation={0}>
+        <Toolbar>
+          <Grid container spacing={1} alignItems="center">
+
+            <Grid item xs />
+            <Grid item>
+            
+                {currentAddress}
+            
+            </Grid>
+            <Grid item>
+            </Grid>
+          </Grid>
+        </Toolbar>
+      </AppBar>
+      <AppBar
+        component="div"
+        // className={classes.secondaryBar}
+        color="primary"
+        position="static"
+        elevation={0}
+      >
+        <Toolbar>
+          <Grid container alignItems="center" spacing={1}>
+            <Grid item xs>
+              <Typography color="inherit" variant="h5" component="h1">
+                {/* THIS SHOULD CHANGE WITH THE USERS */}
+                Verify Recovery as Trustee
+              </Typography>
+            </Grid>
+          </Grid>
+        </Toolbar>
+      </AppBar>
+        <div style={{
+            marginLeft: "30px",
+            marginTop: "30px"
+        }}>
+
             <div>
                 Enter the Eth or Recovery Contract address of the account you wish to verify.
             </div>
@@ -83,9 +120,11 @@ function VerifyPage(){
 
             </div>
         </div>
+        </>
     )
     
 }
 
 
 export default VerifyPage;
+

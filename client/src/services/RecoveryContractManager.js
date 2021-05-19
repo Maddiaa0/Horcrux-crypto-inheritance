@@ -1,24 +1,19 @@
 import ShardManagerContract from "../contracts/ShardManager.json";
 import RecoveryContract from "../contracts/Recovery.json";
-import web3Service from "./Web3Service";
-
-import {ecrecover, fromRpcSig, bufferToInt, toBuffer, pubToAddress, sha256} from "ethereumjs-util";
+import NFTContract from "../contracts/ShardNFT.json";
 
 import getWeb3 from "../getWeb3";
-import BN from "bn.js";
-
-import { Transaction } from '@ethereumjs/tx'
 import Common from "ethereumjs-common";
-import publicKeyToAddress from "ethereum-public-key-to-address";
-import { keccak256 } from "ethereumjs-util";
 import CryptoManager from "./CryptoManager";
-import KeyManager from "./KeyManager";
 import cryptoManager from "./CryptoManager";
 import keyManager from "./KeyManager";
+import CASManager from "./CasManager";
+import BN from "bn.js";
+
+import publicKeyToAddress from 'ethereum-public-key-to-address';
 
 // helper function
 var _secp256k = require('secp256k1');
-
 
 /**Recovery Contract Manager
  * 
@@ -34,7 +29,9 @@ class RecoveryContractManager{
         this.recoveryContractAddress = null;
         this.masterRecoveryContract = null;
         this.nftContractAddress = null;
+        this.nftContract = null;
         this.recoveryContract = null;
+        this.truffleRecoveryContract = null;
         this.inVerify = false;
 
         this.initWeb3Provider();
@@ -91,6 +88,12 @@ class RecoveryContractManager{
             recoveryAddress
         );
 
+        // TODO: work out why this is triggering an ownable response
+        // get the NFT instance address 
+        const nftInstanceAddress = await this.recoveryContract.methods.getNFTAddress().call();
+        this.nftContractAddress = nftInstanceAddress;
+        this.nftContract = await new this.web3.eth.Contract(NFTContract.abi, nftInstanceAddress);
+            
         console.log("Recovery contract loaded " + recoveryAddress.toString());
     }
 
@@ -98,7 +101,7 @@ class RecoveryContractManager{
         this.masterRecoveryContract.events.ShardRecoveryStep({ownerAddress: address}).on("data", async (data) => {
             console.log("Attribute update event logged");
             console.log(data);
-            if (data.returnValues.step == 0){
+            if (data.returnValues.step === 0){
                 this.getRecoveryContractForAddress(address);
             }
 
@@ -163,7 +166,7 @@ class RecoveryContractManager{
 
 
         console.log(shardholders);
-        const result = await this.recoveryContract.methods.batchAddShardholder(shardholders)
+        await this.recoveryContract.methods.batchAddShardholder(shardholders)
             .send({from: this.web3.currentProvider.selectedAddress}, function(err, res) {
                 if (err){
                     console.log("Batch update failed");
@@ -174,11 +177,12 @@ class RecoveryContractManager{
     }
 
     async batchBlacklistShardholder(shardholders){
-        if (typeof shardholders !== "array" && shardholders.length < 1){
+        if (typeof shardholders !== Array && shardholders.length < 1){
             throw Error("Shardholers must be an array and have more than 1 item - use non batch operation");
         }
 
-        const result = await this.recoveryContract.methods.batchBlacklistShardholder(shardholders)
+
+        await this.recoveryContract.methods.batchBlacklistShardholder(shardholders)
             .send({from: this.web3.currentProvider.selectedAddress}, function(err, res) {
                 if (err){
                     console.log("Batch update blacklist failed");
@@ -190,11 +194,11 @@ class RecoveryContractManager{
 
 
     async batchRemoveBlacklistShardholder(shardholders){
-        if (typeof shardholders !== Array && shardholders.length < 1){
-            throw Error("Shardholers must be an array and have more than 1 item - use non batch operation");
+        if (shardholders.length < 1 ){
+            throw Error("Shardholers must be an array");
         }
 
-        const result = await this.recoveryContract.methods.batchBlacklistShardholder(shardholders)
+        await this.recoveryContract.methods.batchRemoveBlacklistShardholder(shardholders)
             .send({from: this.web3.currentProvider.selectedAddress}, function(err, res) {
                 if (err){
                     console.log("Batch Removal update blacklist failed");
@@ -237,10 +241,18 @@ class RecoveryContractManager{
         var shardHoldersObject = [];
         for (let i =0; i< shardHoldersResult.length; i++){
             const isVerified = await this.recoveryContract.methods.confirmed(shardHoldersResult[i]).call({from: this.web3.currentProvider.selectedAddress});
+            var sentShard = false;
+            
+            if (isVerified){
+                const balance = await this.nftContract.methods.balanceOf(shardHoldersResult[i]).call();
+                if (balance > 0) sentShard = true;
+            }
+
             console.log(isVerified);
             shardHoldersObject.push({
                 address: shardHoldersResult[i],
-                verified: isVerified
+                verified: isVerified,
+                sentShard: sentShard
             });
         }
         console.log("SHARD HOLDERS OBJECT");
@@ -317,28 +329,20 @@ class RecoveryContractManager{
      * - This log should include the block in which the transaction was mined.
      * - Find the transaction hash and, v,r,s variables to reconstruct the user's public key!
      * 
+     * TODO: the current value of index being passed in IS HARDCODED from the options selected on the settings page.
+     *      this needs to be fixed, to get the shard index of the last issued shard!!!!!
+     * 
      * @param {String} address 
      */
-    async recoverPublicKeyFromUser(address){
-        console.log(address);
+    async recoverPublicKeyFromUser(address, index){
         // check address is verified
         const isVerified = await this.recoveryContract.methods.confirmed(address).call();
         if (!isVerified) return null;
-
-        console.log(isVerified);
         
         // get the block number in which the confirm took place
         const blockNo = await this.recoveryContract.methods.confirmedBlockNo(address).call();
-        console.log(blockNo);
-        
         const block = await this.web3.eth.getBlock(blockNo);
-        console.log(block.transactions);
-
-        const receipt = await this.web3.eth.getTransactionReceipt(block.transactions[0]);
-        console.log(receipt);
-
         const tx = await this.web3.eth.getTransaction(block.transactions[0]);
-        console.log(tx);
         
         const common = new Common.forCustomChain(
             "mainnet",
@@ -350,11 +354,11 @@ class RecoveryContractManager{
             "petersburg"
         );
         const EthereumTx = require('ethereumjs-tx').Transaction;
-        const testArr = {
+        const txObj = {
             // from: tx.from,
             gas: `0x${parseInt(tx.gas, 10).toString(16)}`,
             gasPrice: `0x${parseInt(tx.gasPrice,10).toString(16)}`,
-            hash: "0xaf1202460394cd45aff4dca2c9446dc8cf9e11e573f3ffc6282853a35270f52f",
+            hash: tx.hash,
             nonce: `0x${parseInt(tx.nonce,10).toString(16)}`,
             r: tx.r,
             s: tx.s,
@@ -366,26 +370,295 @@ class RecoveryContractManager{
         }
 
         // reconstruct public key
-        const pubKeya = new EthereumTx(testArr, {common}).getSenderPublicKey();
+        const pubKeya = new EthereumTx(txObj, {common}).getSenderPublicKey();
         console.log(pubKeya)
 
         // reconstruct address to verify correct public key
-        const sender = new EthereumTx(testArr, {common}).getSenderAddress();
+        const sender = new EthereumTx(txObj, {common}).getSenderAddress();
         console.log(sender.toString("hex"));
 
         // convert to a compresed pub key to be used in asym encrypt
-       const compressedKey = convertToCompressedPublicKey(pubKeya);
+        const compressedKey = convertToCompressedPublicKey(pubKeya);
 
         // perform encryption to encode with derived public key
-        const ipfsCID = await CryptoManager.mintNewShard(compressedKey, 1, this.web3.currentProvider.selectedAddress);
-        console.log(ipfsCID.path)
-        const ipfsHex = this.web3.utils.utf8ToHex(ipfsCID.path)
-        console.log(address);
+        const ipfsCID = await CryptoManager.mintNewShard(Buffer.from(compressedKey), index, this.web3.currentProvider.selectedAddress);
+
+        console.log(this.recoveryContract.methods);
         // call contract to mint this new recovery nft
-        await this.recoveryContract.methods.sendShardToShardOwner(address, ipfsCID.path).send({
-            from: this.web3.currentProvider.selectedAddress
-        });
+        try {
+
+            // const recoveryContract = new this.web3.eth.Contract(RecoveryContract.abi, this.recoveryContractAddress);
+            // console.log(recoveryContract.methods.sendShardToShardOwner(address, "QmbSo373odJ8HosMNYgsFGw5bfkKrG5GhkZwJX9KYNL4zu").encodeABI());
+            const url = "http://localhost:3005/encodeABI?recoveryContractAddress=" + this.recoveryContractAddress + "&addressTo="+address+"&shardURI="+ipfsCID.path;
+            const response = await fetch(url);
+            const responseData = await response.json();
+            
+            const encodedAbi = responseData.abi;
+
+            const count = await this.web3.eth.getTransactionCount(this.web3.currentProvider.selectedAddress);
+            this.web3.eth.sendTransaction({
+                from: this.web3.currentProvider.selectedAddress,
+                nonce: count,
+                gasPrice: "0x20",
+                gasLimit: "0x100000",
+                to: this.recoveryContractAddress,
+                value: "0x0",
+                data: encodedAbi,
+            }, function(err, res){
+                if (err){
+                    console.log(err); return;
+                } 
+                console.log("result ", res);
+            });
+        } catch (e){
+            console.log(e);
+        }
+        
     }
+
+
+    async recoverAddressPubKey(protectingAddress, protectedAddress){
+        const contractAddress = await this.masterRecoveryContract.methods.contractMappings(protectedAddress).call();
+        console.log(protectingAddress);
+        // check address is verified
+        const recoveryContract = new this.web3.eth.Contract(RecoveryContract.abi, contractAddress);
+        const isVerified = await recoveryContract.methods.confirmed(protectingAddress).call();
+        if (!isVerified) return null;
+
+        console.log(isVerified);
+        
+        // get the block number in which the confirm took place
+        const blockNo = await recoveryContract.methods.confirmedBlockNo(protectingAddress).call();
+        const block = await this.web3.eth.getBlock(blockNo);
+        const tx = await this.web3.eth.getTransaction(block.transactions[0]);
+        
+        const common = new Common.forCustomChain(
+            "mainnet",
+            {
+                name:"custom",
+                networkId: "0x1691",
+                chainId: "0x539",
+            },
+            "petersburg"
+        );
+        const EthereumTx = require('ethereumjs-tx').Transaction;
+        const txObj = {
+            // from: tx.from,
+            gas: `0x${parseInt(tx.gas, 10).toString(16)}`,
+            gasPrice: `0x${parseInt(tx.gasPrice,10).toString(16)}`,
+            hash: tx.hash,
+            nonce: `0x${parseInt(tx.nonce,10).toString(16)}`,
+            r: tx.r,
+            s: tx.s,
+            to: tx.to,
+            data:tx.input,
+            transactionIndex: `0x${parseInt(tx.transactionIndex,10).toString(16)}`,
+            v: tx.v,
+            value: `0x${parseInt(tx.value,10).toString(16)}`,
+        }
+
+        // reconstruct public key
+        const pubKeya = new EthereumTx(txObj, {common}).getSenderPublicKey();
+        return pubKeya;
+    }
+
+
+    /**Retrieve the NFTs owned by an account
+     * 
+     * This method will likely be run in isolation, so the correct contract address must be requested manually
+     * 
+     * @param {String} address - the address of the account being protected
+     * @param {String} from - the address of the account checking balances
+     */
+    async getNFTsForAddress(address, from){
+        // get user's recovery contract address
+        const contractAddress = await this.masterRecoveryContract.methods.contractMappings(address).call();
+        console.log("contract address ", contractAddress);
+        const recoveryInstance = await new this.web3.eth.Contract(RecoveryContract.abi, contractAddress);
+        const nftContractAddress = await recoveryInstance.methods.getNFTAddress().call(); 
+        const shardNFTInstance = await new this.web3.eth.Contract(NFTContract.abi, nftContractAddress);
+        console.log("nft contract address ", nftContractAddress);
+
+        // check the NFTs in balance for an account
+        const balances = await shardNFTInstance.methods.balanceOf(from).call();
+        console.log("balances ", balances);
+
+        // if balances is greater than 0, then request a the ids of all of user's nfts, guard clause
+        if (balances < 1) return null;
+        
+        const tokenIds = await shardNFTInstance.methods.tokensOfOwner(from).call();
+        console.log(tokenIds);
+        // Request the IPFS URIs of the shard resources
+        var shardCIDs = {};
+        for (let i = 0; i< tokenIds.length; i++){
+            var cid = await shardNFTInstance.methods.tokenURI(new BN(parseInt(tokenIds[i]))).call();
+            shardCIDs[tokenIds[i]] = cid;
+        }
+
+        console.log(shardCIDs);
+        return shardCIDs;
+    }
+
+    /**Trigger Recovery Event
+     * 
+     * Sends a recovery NFT to each of the user's who are trustees
+     * 
+     * @param {String} reason 
+     */
+    async triggerRecoveryEvent(reason, addressToProtect){
+        // get user's recovery contract address
+        const contractAddress = await this.masterRecoveryContract.methods.contractMappings(addressToProtect).call();
+        console.log("contract address ", contractAddress);
+        const recoveryInstance = await new this.web3.eth.Contract(RecoveryContract.abi, contractAddress);
+
+        const senderPubKey = await this.recoverAddressPubKey(this.web3.currentProvider.selectedAddress, addressToProtect);
+        if (senderPubKey === null) return alert("triggering recovery failed");
+
+        const metadata = {
+            "name": `${reason} Recovery Notification`,
+            "description": `Share to protect ${addressToProtect}`,
+            "sender": this.web3.currentProvider.selectedAddress,
+            "senderPubKey": senderPubKey
+        };
+
+        // upload this metadata to IPFS
+        const cid = await CASManager.addFileToIpds(JSON.stringify(metadata));
+        console.log("cid " ,cid);
+        
+
+        // call contract to mint this new recovery nft
+        try {
+
+            // const recoveryContract = new this.web3.eth.Contract(RecoveryContract.abi, this.recoveryContractAddress);
+            // console.log(recoveryContract.methods.sendShardToShardOwner(address, "QmbSo373odJ8HosMNYgsFGw5bfkKrG5GhkZwJX9KYNL4zu").encodeABI());
+            const url = "http://localhost:3005/encodeABItriggerRecovery?recoveryContractAddress=" + contractAddress + "&shardURI="+cid.path;
+            const response = await fetch(url);
+            const responseData = await response.json();
+            
+            const encodedAbi = responseData.abi;
+            console.log("encoded abi, ", encodedAbi)
+
+            // send the raw abi
+            const count = await this.web3.eth.getTransactionCount(this.web3.currentProvider.selectedAddress);
+            this.web3.eth.sendTransaction({
+                from: this.web3.currentProvider.selectedAddress,
+                nonce: count,
+                gasPrice: "0x20",
+                gasLimit: "0x100000",
+                to: contractAddress,
+                value: "0x0",
+                data: encodedAbi,
+            }, function(err, res){
+                if (err){
+                    console.log(err); return;
+                } 
+                console.log("result ", res);
+            });
+        } catch (e){
+            console.log(e);
+        }
+        
+    }
+
+    /**This message will send your recovery shard to the user who initialised recovery
+     * allowing them to reconstruct the original secret
+     * 
+     * - Get the public key of the user who triggered recovery,
+     * - Decrypt the user's recovery NFT
+     * - Re-mint a new recoery NFT owned by the person who triggered recovery
+     * - It will end up in their wallet to view and reconstruct the secret
+     */
+    async sendRecoveryShard(privKey, addressToProtect, alertObject, recoveryShare){
+        // verify the sender public key matches the address of the user who initiliased recovery
+        const contractAddress = await this.masterRecoveryContract.methods.contractMappings(addressToProtect).call();
+        console.log("contract address ", contractAddress);
+        const recoveryInstance = await new this.web3.eth.Contract(RecoveryContract.abi, contractAddress);
+        const addressThatInitialisedRecovery = await recoveryInstance.methods.viewWhoTriggeredRecovery().call();
+
+        // reconstruct the public key to verify they are the sender 
+        const senderPubkey = convertToCompressedPublicKey(Buffer.from(alertObject["senderPubKey"]));
+        console.log("Sender pub key from response obj, ", senderPubkey);
+        const address = publicKeyToAddress(Buffer.from(senderPubkey));
+        console.log("Address from contract, ", addressThatInitialisedRecovery);
+        console.log("Address from pub key, ", address );
+        
+        // guard clause if the recovered address does not match that which triggered recovery
+        if (addressThatInitialisedRecovery !== address) return alert("Security issue, cannot trigger recovery");
+
+        // unencrypt the recovery share
+        const unencryptedShare = await CryptoManager.assymetricDecrypt(privKey, recoveryShare.data);
+
+        // reencrypt the share with the new senders address
+        const newEncryptedShare = await CryptoManager.assymetricEncrypt(senderPubkey, unencryptedShare);
+
+        // create a new NFT object and add to ipfs
+        const nftRecoveryResponse = {
+            "name": "Recovery Response",
+            "description": `Recovery Response ${addressToProtect}`,
+            "sender": this.web3.currentProvider.selectedAddress,
+            "data": newEncryptedShare
+        };
+
+        const cid = await CASManager.addFileToIpds(JSON.stringify(nftRecoveryResponse));
+
+        // call contract to make recovery response
+        try {
+
+            // const recoveryContract = new this.web3.eth.Contract(RecoveryContract.abi, this.recoveryContractAddress);
+            // console.log(recoveryContract.methods.sendShardToShardOwner(address, "QmbSo373odJ8HosMNYgsFGw5bfkKrG5GhkZwJX9KYNL4zu").encodeABI());
+            const url = "http://localhost:3005/encodeABIRespondRecovery?recoveryContractAddress=" + contractAddress + "&shardURI="+cid.path;
+            const response = await fetch(url);
+            const responseData = await response.json();
+            
+            const encodedAbi = responseData.abi;
+            console.log("encoded abi, ", encodedAbi)
+
+            // send the raw abi
+            const count = await this.web3.eth.getTransactionCount(this.web3.currentProvider.selectedAddress);
+            this.web3.eth.sendTransaction({
+                from: this.web3.currentProvider.selectedAddress,
+                nonce: count,
+                gasPrice: "0x20",
+                gasLimit: "0x100000",
+                to: contractAddress,
+                value: "0x0",
+                data: encodedAbi,
+            }, function(err, res){
+                if (err){
+                    console.log(err); return;
+                } 
+                console.log("result ", res);
+                alert("Recovery shard sent")
+            });
+        } catch (e){
+            console.log(e);
+        }
+    }
+
+    /**Recombine Recovery Secrets
+     * 
+     * Takes all of the fetched shards from IPFS and recombines them into the seed phrase
+     * 
+     * @param {Object[]} recoverySecrets 
+     * @param {String} privatekey 
+     * @returns {String} recoveredSecret 
+     */
+    async recombineRecoverySecrets(recoverySecrets, privatekey){
+        
+        var decryptedSecrets=[];
+        for (let i =0; i< recoverySecrets.length; i++){
+            const decrepytedShare = await cryptoManager.assymetricDecrypt(privatekey, recoverySecrets[i].data);
+            console.log(JSON.parse(JSON.parse(decrepytedShare)));
+            decryptedSecrets.push(JSON.parse(JSON.parse(JSON.parse(decrepytedShare))));
+        }
+        console.log(decryptedSecrets);
+        // recombine the shares
+        const justShares = decryptedSecrets.map(secret => secret.share);
+        console.log(justShares);
+        return cryptoManager.recombineForSecret(justShares);
+    }
+
+
 }
 
 const recoveryContractManager = new RecoveryContractManager();

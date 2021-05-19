@@ -9,7 +9,7 @@ import keyManager from "../../../services/KeyManager";
 import CryptoManager from "../../../services/CryptoManager";
 import RecoveryContractManager from "../../../services/RecoveryContractManager";
 
-const ethUtil = require('ethereumjs-util')
+import {privateToAddress} from 'ethereumjs-util';
 
 function CreateRecoveryContract(){
     const history = useHistory();
@@ -20,7 +20,7 @@ function CreateRecoveryContract(){
     async function getKeys(){
         const _keys = keyManager.getKeysFromStorage("password");
         console.log(_keys);
-        const addr = ethUtil.privateToAddress(`0x${_keys.privKey}`);
+        const addr = privateToAddress(Buffer.from(_keys.privKey, "hex"));
         const _ethAddress = `0x${addr.toString("hex")}`;
         setEthAddress(_ethAddress);
         setKeys(_keys);
@@ -56,10 +56,15 @@ function CreateRecoveryContract(){
     return (
         <div>
             <SignUpTitle>
-                Create Recovery Contract
+                Use Social Recovery
             </SignUpTitle>
+            
             <SignUpParagraph>
-                In order to set up anonymous social recovery you will need to create a contract that is linked to yourEthereum address.
+                In case you have lost your seed phrase, you can recover your vault by asking your Trustees for help. To initiate recovery, all you need is consensus among your Trustees.
+            </SignUpParagraph>
+            
+            <SignUpParagraph>
+                To enroll with social recovery, you will be prompted to sign an Ethereum transaction, which will enable recovery for your account!
                 <br/>
                 This will cost you a fee depending on network usage.
                 MetaMask will prompt you to to sign a transaction in order to generate a recovery contract.
@@ -67,21 +72,22 @@ function CreateRecoveryContract(){
             <SignUpParagraph>
                 You must have funds within your ethereum address for the transaction to go through.
             </SignUpParagraph>
-            <SignUpParagraph>
+            {/* <SignUpParagraph>
                 Your public and private keys are:
-            </SignUpParagraph>
-            <SignUpParagraph>
+            </SignUpParagraph> */}
+            {/* <SignUpParagraph>
                 Public Key: {keys.pubKey}
             </SignUpParagraph>
             <SignUpParagraph>
                 Private Key: {keys.privKey}
-            </SignUpParagraph>
+            </SignUpParagraph> */}
             <SignUpParagraph>
-                This corresponds to the following Ethereum Address: {ethAddress}
+                <br/>
+                This corresponds to the following Ethereum Address: <strong>{ethAddress}</strong>
             </SignUpParagraph>
 
             <SignUpParagraph>
-                Import your private key into metamask and provide Eth to continue to make transactions.
+                The current version requires you to import your account into metamask to continue! - An in-service wallet has not been created.
             </SignUpParagraph>
 
             <Button 

@@ -3,20 +3,25 @@ import CryptoManager from "./CryptoManager";
 import KeyManager from "./KeyManager";
 
 import {Client, Buckets, UserAuth, PrivateKey, Identity} from "@textile/hub";
+import { Context } from '@textile/context'
 // import { providers, utils } from 'ethers'
-import { hashSync } from 'bcryptjs'
 import cryptoManager from './CryptoManager';
 import keyManager from './KeyManager';
 import eccrypto from "eccrypto";
 import axios from "axios";
+import { hashSync } from 'bcryptjs'
 
 
+import GetWeb3 from "../getWeb3";
 import local from '../config/local';
 const ethUtil = require('ethereumjs-util')
 
+
 const TEXTILE_KEY_OBJECT = {
     key: "bcty2t3xgzbvq26h4wyy7u4rhwa"
+    // key: "b4pepz3xhdkekhkypr2scsieuxu"
 };
+
 
 class CasManager {
 
@@ -29,6 +34,30 @@ class CasManager {
         this.ipfs = ipfs;
         this.userIdentity = null;
         this.userBucketInfo = null;
+        this.accessGroups = [
+          {
+              "name": "family",
+              "index": 2
+          },
+          {
+              "name": "lawyer",
+              "index": 3
+          },
+          {
+            "name": "Caroline",
+            "index": 4
+          }
+      ];
+
+        // method binding
+        this.storeUserIdentity = this.storeUserIdentity.bind(this);
+        this.addFileToIPFSandTextile = this.addFileToIPFSandTextile.bind(this);
+        this.addFileToIpds = this.addFileToIpds.bind(this);
+        this.authorizeDev = this.authorizeDev.bind(this);
+        this.checkIpfsInitialised = this.checkIpfsInitialised.bind(this);
+        this.getFileFromCID = this.getFileFromCID.bind(this);
+        this.generatePrivateKey = this.generatePrivateKey.bind(this);
+        this.getOrCreateBucket = this.getOrCreateBucket.bind(this);
     }
 
     /**
@@ -60,7 +89,7 @@ class CasManager {
 
     async getFileFromCID(_cid){
       const res = await axios.get(`http://localhost:8080/ipfs/${_cid}`);
-      if (res.status == 200){
+      if (res.status === 200){
         console.log(res.data);
         return res.data;
       } else {
@@ -128,25 +157,27 @@ class CasManager {
      * 
      */
     async initTextileForUser(){
+        // get private key from storage!
         const keys = KeyManager.getKeysFromStorage("password");
         console.log(keys);
-        const addr = ethUtil.privateToAddress(`0x${keys.privKey}`);
+        const addr = ethUtil.privateToAddress(Buffer.from(keys.privKey, "hex"));
         const _ethAddress = `0x${addr.toString("hex")}`;
         console.log(_ethAddress);
 
-        // get the users identity from storage or create a new one using metamask and their address and private key as entropy
+        // get the users textile identity from storage or create a new one using metamask and their address and private key as entropy
+        // if one is stored, then use that one, else require it to be signed by metamask
         const storedId = await this.getUserIdentityFromStorage();
         if (storedId !== undefined && storedId !== null){
             this.userIdentity = PrivateKey.fromString(storedId);
         } else {
-            // await this.generatePrivateKey(_ethAddress);
+            await this.generatePrivateKey(_ethAddress);
         }
 
         // set up the the client
-        const client = await this.authorizeDev();
-        const returned = await this.setUpUserBuckets();
-        this.userBucketInfo = returned;
-        console.log(returned);
+        // const client = await this.authorizeDev();
+        const userBuckets = await this.setUpUserBuckets();
+        this.userBucketInfo = userBuckets;
+        console.log(userBuckets);
 
         // return if the userBucket has been initialised successfully
         if (this.userBucketInfo !== null) return true;
@@ -164,15 +195,15 @@ class CasManager {
     // }
 
     
-    // async signMessage(message){
-    //     if (this.userIdentity == null){
-    //         throw new Error("User Identity is not defined");
-    //     }
+    async signMessage(message){
+        if (this.userIdentity == null){
+            throw new Error("User Identity is not defined");
+        }
 
-    //     const mes = Buffer.from(message);
-    //     const cred = this.userIdentity.sign(mes);
-    //     return cred;
-    // }
+        const mes = Buffer.from(message);
+        const cred = this.userIdentity.sign(mes);
+        return cred;
+    }
 
     // /**Authorize Dev - get client
     //  * 
@@ -182,7 +213,8 @@ class CasManager {
         if (this.userIdentity == null){
             throw new Error("User Identity is not defined");
         }
-
+        // const client = await new Client(new Context("http://127.0.0.1:3007"));
+        // const await new Buckets()
         const client = await Client.withKeyInfo(TEXTILE_KEY_OBJECT);
         await client.getToken(this.userIdentity);
         return client;
@@ -190,9 +222,15 @@ class CasManager {
 
 
     async setUpUserBuckets(){
-        const buckets = await Buckets.withKeyInfo(TEXTILE_KEY_OBJECT);
+        // const buckets = await Buckets.withKeyInfo(TEXTILE_KEY_OBJECT);
+        const buckets = await new Buckets(new Context("http://127.0.0.1:3007"));
+        // await buckets.context.withAPIKey(TEXTILE_KEY_OBJECT);
+        
         await buckets.getToken(this.userIdentity);
+        // await buckets.getTokenChallenge(this.userIdentity);
 
+        console.log(this.userIdentity);
+        console.log(keyManager.publicKey);
         const bucketResult = await buckets.getOrCreate(KeyManager.publicKey);
         console.log(bucketResult);
         if (!bucketResult.root){
@@ -204,104 +242,114 @@ class CasManager {
             userBucket: bucketResult
         };
     }
-
-
-
-    // generateMessageForEntropy(ethereum_address, application_name, secret) {
-    //     return (
-    //       '******************************************************************************** \n' +
-    //       'READ THIS MESSAGE CAREFULLY. \n' +
-    //       'DO NOT SHARE THIS SIGNED MESSAGE WITH ANYONE OR THEY WILL HAVE READ AND WRITE \n' +
-    //       'ACCESS TO THIS APPLICATION. \n' +
-    //       'DO NOT SIGN THIS MESSAGE IF THE FOLLOWING IS NOT TRUE OR YOU DO NOT CONSENT \n' +
-    //       'TO THE CURRENT APPLICATION HAVING ACCESS TO THE FOLLOWING APPLICATION. \n' +
-    //       '******************************************************************************** \n' +
-    //       'The Ethereum address used by this application is: \n' +
-    //       '\n' +
-    //       ethereum_address +
-    //       '\n' +
-    //       '\n' +
-    //       '\n' +
-    //       'By signing this message, you authorize the current application to use the \n' +
-    //       'following app associated with the above address: \n' +
-    //       '\n' +
-    //       application_name +
-    //       '\n' +
-    //       '\n' +
-    //       '\n' +
-    //       'The hash of your non-recoverable, private, non-persisted password or secret \n' +
-    //       'phrase is: \n' +
-    //       '\n' +
-    //       secret +
-    //       '\n' +
-    //       '\n' +
-    //       '\n' +
-    //       '******************************************************************************** \n' +
-    //       'ONLY SIGN THIS MESSAGE IF YOU CONSENT TO THE CURRENT PAGE ACCESSING THE KEYS \n' +
-    //       'ASSOCIATED WITH THE ABOVE ADDRESS AND APPLICATION. \n' +
-    //       'AGAIN, DO NOT SHARE THIS SIGNED MESSAGE WITH ANYONE OR THEY WILL HAVE READ AND \n' +
-    //       'WRITE ACCESS TO THIS APPLICATION. \n' +
-    //       '******************************************************************************** \n'
-    //     );
-    //   }
+      
+      // ensures that web3 is created and gets the signer
+      getSigner = async () => {
+        if (!window.ethereum) {
+          throw new Error(
+            'Ethereum is not connected. Please download Metamask from https://metamask.io/download.html'
+          );
+        }
     
-    //   getSigner = async () => {
-    //     if (!window.ethereum) {
-    //       throw new Error(
-    //         'Ethereum is not connected. Please download Metamask from https://metamask.io/download.html'
-    //       );
-    //     }
+        console.debug('Initializing web3 provider...');
+        const web3 = await GetWeb3();
+        return web3;
+      }
     
-    //     console.debug('Initializing web3 provider...');
-    //     // const provider = new providers.Web3Provider(window.ethereum);
-    //     // const signer = provider.getSigner();
-    //     // return signer
-    //   }
-    
-    //   async getAddressAndSigner(ethAddress) {
-    //     // const signer = await this.getSigner()
-    //     // return {address: ethAddress, signer}
-    //   }
-    //   generatePrivateKey = async ethAddress => {
-    //       console.log(ethAddress)
-    //     const metamask = await this.getAddressAndSigner(ethAddress)
-    //     console.log(metamask.address);
-    //     // avoid sending the raw secret by hashing it first
-    //     const secret = hashSync(KeyManager.privateKey, 10)
-    //     const message = this.generateMessageForEntropy(metamask.address, 'user-textile-bucket-key', secret)
-    //     const signedText = await metamask.signer.signMessage(message);
-    //     const hash =  ethUtil.keccak256(signedText);// utils.keccak256(signedText);
-    //     console.log(hash);
-    //     if (hash === null) {
-    //       throw new Error('No account is provided. Please provide an account to this application.');
-    //     }
-    //     // The following line converts the hash in hex to an array of 32 integers.
-       
-    //     const array = hash
-    //       .replace('0x', '')
-    //       .match(/.{2}/g)
-    //       .map((hexNoPrefix) => new ethUtil.BN('0x' + hexNoPrefix).toNumber())
+      /** Get address and signer
+       * 
+       * gets a web3 instance to use as a signer
+       * 
+       * @param {String} ethAddress 
+       * @returns {Object} address and web3 instance
+       */
+      async getAddressAndSigner(ethAddress) {
+        const web3 = await this.getSigner()
+        return {address: ethAddress, web3}
+      }
+
+      // create a textile key from a signed message from the user
+      generatePrivateKey = async ethAddress => {
+        console.log(ethAddress)
+        const metamask = await this.getAddressAndSigner(ethAddress)
+        console.log(metamask.address);
+
+        // avoid sending the raw secret by hashing it first
+        const secret = hashSync(KeyManager.privateKey, 10)
         
-    //     if (array.length !== 32) {
-    //       throw new Error('Hash of signature is not the correct size! Something went wrong!');
-    //     }
-    //     const identity = PrivateKey.fromRawEd25519Seed(Uint8Array.from(array))
-    //     console.log(identity.toString());
-    //     this.storeUserIdentity(identity.toString());
-    //     // Your app can now use this identity for generating a user Mailbox, Threads, Buckets, etc
-    //     this.userIdentity = identity;
-    //     return identity
-    //   }
+        const msgParams = [
+          {
+            type: 'string',
+            name: 'Message',
+            value: 'Sign to create / allow this browser to access your crypto vault'
+          },
+          {
+            type: 'string',
+            name: 'From the address',
+            value: metamask.address
+          },
+          {
+            type: "string",
+            name: "With this seed",
+            value: secret
+          }
+        ]
+      
+        var from = metamask.web3.currentProvider.selectedAddress
+        var params = [msgParams, from]
+        var method = 'eth_signTypedData'
+      
+        return await metamask.web3.currentProvider.send({
+          method,
+          params,
+          from,
+        },  (err, result) => {
 
+          if (err) throw new Error("Sig failed");
+          
+          console.log(result.result);
+          const hash = ethUtil.keccak256(Buffer.from(result.result, "hex"));
+          console.log(hash);
+          // check a valid hash is produced
+          if (hash === null) {
+            throw new Error('No account is provided. Please provide an account to this application.');
+          }
+          
+          if (hash.length !== 32) {
+            throw new Error('Hash of signature is not the correct size! Something went wrong!');
+          }
+          const identity = PrivateKey.fromRawEd25519Seed(Uint8Array.from(hash))
+          console.log(identity.toString());
+          this.storeUserIdentity(identity.toString());
 
-    //   async storeUserIdentity(identity){
-    //       if (typeof identity !== "string" && identity == null){
-    //         throw new Error("String identity required");
-    //       }
+          // Your app can now use this identity for generating a user Mailbox, Threads, Buckets, etc
+          this.userIdentity = identity;
+          return identity
+    
+        });
+        
+      }
 
-    //       localStorage.setItem("identity", identity);
-    //   }
+      /**Store User Identity
+       * 
+       * Stores the identity of the created textile bucket to local storage, so it can be easily be fetched again
+       * 
+       * @param {String} identity 
+       */
+      async storeUserIdentity(identity){
+          if (typeof identity !== "string" && identity == null){
+            throw new Error("String identity required");
+          }
 
+          localStorage.setItem("identity", identity);
+      }
+
+      /**Get User Identity from storage
+       * 
+       * Returns the string representation of the user's textile identity
+       * 
+       * @returns {String} id
+       */
       async getUserIdentityFromStorage(){
         const id = localStorage.getItem("identity");
         return id;
@@ -323,12 +371,13 @@ class CasManager {
        * @param {Buffer | String} fileBuffer 
        * @param {String} fileName 
        * @param {boolean} isPath 
+       * @param {Number} accessGroupNumber
        */
-      async addFileToIPFS(textilePath, fileBuffer, fileName, isPath){
+      async addFileToIPFSandTextile(textilePath, fileBuffer, fileName, isPath, accessGroupNumber){
         // encrypt the file with an ephemeral key  
         // first add the file to ipfs
           // get the hash of the uploaded file
-          // add the uploaded file to the given path in textile? - that should do it
+          // add the uploaded file to the given path in textile? - that should do it        
         const {encryptedBuffer, ephKey} = await CryptoManager.encryptFileForIPFS(fileBuffer, isPath);
 
         // add file to ipfs
@@ -343,17 +392,56 @@ class CasManager {
             CID: CID.path
         };
 
-        const keys = await keyManager.getKeysFromStorage("password");
+        // using the provided accessGroupNumber, generate the correct BIP32 key pair to perform encryption with
+        const encryptionKey = await keyManager.getAccessGroupKey(accessGroupNumber);
+        console.log(encryptionKey);
 
-        // asynmetrically encrypt the meta data
-        const encrypted = await CryptoManager.assymetricEncrypt(keys.pubKey, JSON.stringify(metaData));
+        // // asynmetrically encrypt the meta data
+        const encrypted = await CryptoManager.assymetricEncrypt(encryptionKey.pubKey, metaData);
         const uploadedFileCID = await this.addFileToIpds(JSON.stringify(encrypted));
         console.log(uploadedFileCID.path);
 
         // add the file to textile!!
-        return uploadedFileCID.path;
+        const textileInfo = await this.addtoTextileBucket(textilePath, uploadedFileCID.path, accessGroupNumber);
 
+        return {cid: uploadedFileCID.path, textileInfo};
       }
+
+      /**Add to Textile Bucket
+       * 
+       * Adds the provided CID from file upload to the provided textile path 
+       * 
+       * @param {Sting} path 
+       * @param {String} cid 
+       * @param {String} accessGroupNumber
+       * @returns 
+       */
+      async addtoTextileBucket(path, cid, accessGroupNumber){
+        if (!this.userBucketInfo) throw new Error("No bucket provided");
+
+        const buckets = this.userBucketInfo.buckets;
+        const textileObject = Buffer.from(JSON.stringify({
+          path,
+          cid,
+          accessGroupNumber
+        }));
+        return await buckets.pushPath(this.userBucketInfo.bucketKey, path, textileObject);
+      }
+
+      /**Get files in Path
+       * 
+       * @param {String} path 
+       * @returns buckets
+       */
+      async getFilesInPath(path){
+        if (!this.userBucketInfo) throw new Error("No bucket provided yet");
+
+        const bucket = this.userBucketInfo.buckets;
+        const key = this.userBucketInfo.bucketKey;
+        return await bucket.listPath(key, path, 2);
+        // return await bucket.listPath(key, path);
+      }
+
 
       /**Get File from IPFS
        * 
@@ -368,37 +456,130 @@ class CasManager {
        * @returns {Buffer} DecryptedFile
        * 
        * @param {String} metaDataCID 
+       * @param {Number} accessGroupNumber
        */
-      async getFileFromIPFS(metaDataCID){
+      async getFileFromIPFS(metaDataCID, accessGroupNumber){
         // this will return the metadata file
-        const keys = await keyManager.getKeysFromStorage("password");
+        const keys = await keyManager.getAccessGroupKey(accessGroupNumber);
+        console.log(keys);
         const encryptedMetadata = await this.getFileFromCID(metaDataCID);
-        const decryptedMetaData = JSON.parse(await CryptoManager.assymetricDecrypt(keys.privKey, encryptedMetadata));
+        
+        const asUINTs = {
+          ciphertext: Buffer.from(encryptedMetadata.ciphertext),
+          ephemPublicKey: Buffer.from(encryptedMetadata.ephemPublicKey),
+          iv: Buffer.from(encryptedMetadata.iv),
+          mac: Buffer.from(encryptedMetadata.mac)
+        }
+        console.log(asUINTs);
+
+        const decryptedMetaData = JSON.parse(await CryptoManager.asymDecryptFiles(keys.privKey, asUINTs));
+        console.log(decryptedMetaData);
 
         // get the full file form IPFS
         const fileBuffer = Buffer.from(await this.getFileFromCID(decryptedMetaData.CID));
-        const decryptedBuffer = CryptoManager.decryptSymmetricBuffer(fileBuffer, decryptedBuffer.ephKey);
+        const decryptedBuffer = CryptoManager.decryptSymmetricBuffer(fileBuffer, decryptedMetaData.ephKey);
         console.log(decryptedBuffer.toString());
         return decryptedBuffer;
       }
 
+      /**Remove File
+       * 
+       * Removes teh file with the given path from the user's textile bucket
+       * 
+       * @param {String} path 
+       * @returns {boolean} succeeded
+       */
+      async removeFile(path){
+        if (this.userBucketInfo === null || this.userBucketInfo === undefined) throw new Error("No user bucket provided");
 
+        const bucket = this.userBucketInfo.buckets;
+        const key = this.userBucketInfo.bucketKey;
+        return bucket.removePath(key, path).then(removalResponse => {
+          console.log(removalResponse);
+          return true;
+        }).catch(err => {
+          console.log(err);
+          return false;
+        });
+      }
+
+      /**Get Access Groups
+       * 
+       * Request the accessgroups file found at the root of the textile bucket
+       */
+      async getAccessGroups(){
+        // TODO: FIX AFTER PRES
+        // require that buckets be initialised
+        // if (this.userBucketInfo === null){
+        //   await this.initTextileForUser();
+        // }
+        // console.log("SUm");
+        // const rootPath = await this.getFilesInPath("/");
+        // console.log(rootPath);
+        
+        // if (rootPath.item.items.some(item => item.name === ".accessgroups")){
+        //   // access groups exist, request file and read to memory
+        //   var buffer = await this.userBucketInfo.buckets.pullPath(this.userBucketInfo.bucketKey, "./accessgroups");
+        //   console.log(typeof buffer);
+        //   const accessgroups = buffer;
+        //   console.log(accessgroups);
+        //   this.accessGroups = accessgroups;
+        // } 
+        // // else{
+        // //   // access groups file does not exist, create
+        // //   this.userBucketInfo.buckets.pushPath(this.userBucketInfo.bucketKey, "/.accessgroups", Buffer.from(JSON.stringify([])));
+        // //   this.accessGroups = {};
+        // // }
+        return this.accessGroups;
+      }
+
+      /**Add Access Group
+       * 
+       * Adds a new access group for the user
+       * 
+       * @param {String} groupToAdd 
+       */
+      async addAccessGroup(groupToAdd){
+        // if (this.accessGroups === null) await this.getAccessGroups();
+        console.log(this.accessGroups);
+        var tempAccessGroup = this.accessGroups;
+        // get the current highest index
+        
+        var max = 0;
+        for (let i = 0; i < this.accessGroups.length; i++){
+          if (tempAccessGroup[i].index > max) max = tempAccessGroup[i].index;
+        }
+
+        // add new access group with a higher number
+        tempAccessGroup.push({
+          name: groupToAdd,
+          index: (max+1)
+        });
+
+        // this.userBucketInfo.buckets.pushPath(this.userBucketInfo.bucketKey, "./accessgroups", Buffer.from(JSON.stringify(tempAccessGroup)));
+        this.accessGroups = tempAccessGroup;
+        console.log(this.accessGroups);
+      }
 
       // test encrypt TODO: REMOVE THeSE AS CLUTTER
       async testEncrypt(){
         console.log("using currently logged in users public key to encrypt");
-        const keys = await keyManager.getKeysFromStorage("password");
+        // const keys = await keyManager.getKeysFromStorage("password");
+        const keys = await keyManager.getAccessGroupKey(2);
         // asynmetrically encrypt the meta data
-        const encrypted = await eccrypto.encrypt(Buffer.from(keys.pubKey, "hex"), Buffer.from("Here is the test decryption phrase"));
+        const encrypted = await eccrypto.encrypt(Buffer.from(keys.pubKey, "hex"), Buffer.from(JSON.stringify({
+          message: "here is the message"
+        })));
         console.log(encrypted);
         return encrypted;
       }
 
       async testDecrypt(encrypted){
         console.log("Using currently logged in users private key to decrypt");
-        const keys = await keyManager.getKeysFromStorage("password");
+        // const keys = await keyManager.getKeysFromStorage("password");
+        const keys = await keyManager.getAccessGroupKey(2);
 
-        const decryptedMetaData = (await eccrypto.decrypt(Buffer.from(keys.privKey, "hex"), encrypted)).toString();
+        const decryptedMetaData = JSON.parse((await eccrypto.decrypt(Buffer.from(keys.privKey, "hex"), encrypted)).toString());
         console.log(decryptedMetaData);
         return decryptedMetaData;
       }

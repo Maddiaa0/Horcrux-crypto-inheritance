@@ -28,14 +28,13 @@ function CycleKeys(){
     
     return (
         <div>
-            Cycle Keys
-            <div>
+            <Typography variant="h5">Cycle Keys</Typography>
+            <Typography>
                 If you feel you feel your current address has been compromised, you can cycle your keys to a new set to prevent another an attacker
                 having access to your account
-            </div>
-            Edit Shardholders
+            </Typography>
             <SimpleSnackbar open={snackBarOpen} message="No Address Selected" handleClose={closeSnackbar}/>
-            <Card variant="outlined">
+            <Card variant="outlined" style={{margin:"10px"}}>
             
                 <CardContent>
                     <Typography color="textSecondary" gutterBottom>
@@ -66,7 +65,7 @@ function CycleKeys(){
                 </CardActions>
             </Card>
 
-            <Card variant="outlined">
+            <Card variant="outlined" style={{margin:"10px"}}>
                 <CardContent>
                     <Typography color="textSecondary" gutterBottom>
                         Cycle Recovery Keys

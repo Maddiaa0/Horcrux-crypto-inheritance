@@ -17,6 +17,7 @@ import KeyManager from "../../../services/KeyManager";
 // style
 import "./createBIP39.css";
 import Bip39Box from "../../../components/sign-up/Bip39Box";
+import BIP39MoreInfoDialog from "../../../components/sign-up/Bip39MoreInfoDialog";
 
 
 
@@ -26,7 +27,8 @@ function CreateBIP39(){
     // get the bip39 value from our global bip39
     // const bip39Phrase = useRecoilValue(bip39State);
 
-    var phrase = "shelf shelf shelf shelf shelf shelf shelf shelf shelf shelf shelf shelf";
+    var phrase = "student aim pottery dentist evoke salmon clean buzz taxi civil weapon jacket";
+    //TODO: Bring this back after demo
     if (KeyManager.mnemonic === null ){
         alert("Mnemonic failed to generate");
     } else {
@@ -43,13 +45,10 @@ function CreateBIP39(){
         <div className="create-bip-container">
             <div>
                 <SignUpTitle>Secret Backup Phrase</SignUpTitle>
-                <SignUpParagraph>This secret phrase lets you back up and restore your account and any files you have saved from anywhere</SignUpParagraph>
-                <SignUpParagraph>Warning - whoever has possession of this back up phrase has possession of your files, NEVER give it to anyone</SignUpParagraph>
+                <SignUpParagraph>This secret phrase lets you back up and recovery your files you have from anywhere</SignUpParagraph>
+                <SignUpParagraph>Warning - whoever is in possession of this back up phrase will be able to access your files, keep it sage and NEVER give it to anyone</SignUpParagraph>
             </div>
-            <div>
-                Click here for information on how to manage and store you backup phrase
-            </div>
-
+            <BIP39MoreInfoDialog/>
             
             <Bip39Box phrase={phrase}/>
 
@@ -66,13 +65,6 @@ function CreateBIP39(){
                     Next
                 </Button>
             </div>
-
-
-            <div>TODO: Information on where and how they should store all of this information</div>
-            
-
-
-            
         </div>
     )
 

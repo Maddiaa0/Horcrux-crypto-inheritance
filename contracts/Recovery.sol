@@ -27,7 +27,7 @@ contract Recovery is Ownable {
     //TODO: Set recovery state along the chain
     RecoveryState recoveryState;
     // Will be set if a trustee has triggered recovery
-    address trusteeTriggeredRecovery;
+    address public trusteeTriggeredRecovery;
     IShardManager parentContract;
     ShardNFT nftContract;
 
@@ -58,7 +58,7 @@ contract Recovery is Ownable {
         recoveryThreshold = _recoveryThreshold;
     }
 
-    function getNFTAddress() public view onlyOwner returns (address) {
+    function getNFTAddress() public view returns (address) {
         return address(nftContract);
     }
 

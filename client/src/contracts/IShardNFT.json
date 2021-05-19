@@ -26,7 +26,7 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.7.4+commit.3f05b770\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_shardOwner\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"tokenURI\",\"type\":\"string\"}],\"name\":\"distributeShard\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"distributeShard(address,string)\":{\"notice\":\"Sends a token NFT to a given address\"}},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/C/Users/schee/Documents/Uni/FYP/Project/contracts/IShardNFT.sol\":\"IShardNFT\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/C/Users/schee/Documents/Uni/FYP/Project/contracts/IShardNFT.sol\":{\"keccak256\":\"0xbfdbff198b20810cd60e7975cfcb6bd0143a3e83fd8ea9f6c7a3be6198712490\",\"license\":\"UNLICENSED\",\"urls\":[\"bzz-raw://d466bf06ec4f52d42e731fab196d60396fee2e9dd39a0080ea0801767390c0e5\",\"dweb:/ipfs/QmbHkPcnDahz1hqbn4Prbfg19oMcz9t9aLKoRhLX1GqgRw\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.7.4+commit.3f05b770\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_shardOwner\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"tokenURI\",\"type\":\"string\"}],\"name\":\"distributeShard\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"distributeShard(address,string)\":{\"notice\":\"Sends a token NFT to a given address\"}},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/C/Users/schee/Documents/Projects/fresh_fyp/contracts/IShardNFT.sol\":\"IShardNFT\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/C/Users/schee/Documents/Projects/fresh_fyp/contracts/IShardNFT.sol\":{\"keccak256\":\"0xbfdbff198b20810cd60e7975cfcb6bd0143a3e83fd8ea9f6c7a3be6198712490\",\"license\":\"UNLICENSED\",\"urls\":[\"bzz-raw://d466bf06ec4f52d42e731fab196d60396fee2e9dd39a0080ea0801767390c0e5\",\"dweb:/ipfs/QmbHkPcnDahz1hqbn4Prbfg19oMcz9t9aLKoRhLX1GqgRw\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "immutableReferences": {},
@@ -35,9 +35,9 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "// SPDX-License-Identifier: UNLICENSED\r\npragma solidity ^0.7.4;\r\n\r\ninterface IShardNFT {\r\n    /**Sends a token NFT to a given address\r\n     *\r\n     *\r\n     */\r\n    function distributeShard(address _shardOwner, string memory tokenURI)\r\n        external\r\n        returns (uint256);\r\n}\r\n",
-  "sourcePath": "C:/Users/schee/Documents/Uni/FYP/Project/contracts/IShardNFT.sol",
+  "sourcePath": "C:/Users/schee/Documents/Projects/fresh_fyp/contracts/IShardNFT.sol",
   "ast": {
-    "absolutePath": "/C/Users/schee/Documents/Uni/FYP/Project/contracts/IShardNFT.sol",
+    "absolutePath": "/C/Users/schee/Documents/Projects/fresh_fyp/contracts/IShardNFT.sol",
     "exportedSymbols": {
       "IShardNFT": [
         65
@@ -193,7 +193,7 @@
   },
   "legacyAST": {
     "attributes": {
-      "absolutePath": "/C/Users/schee/Documents/Uni/FYP/Project/contracts/IShardNFT.sol",
+      "absolutePath": "/C/Users/schee/Documents/Projects/fresh_fyp/contracts/IShardNFT.sol",
       "exportedSymbols": {
         "IShardNFT": [
           65
@@ -371,7 +371,7 @@
   },
   "networks": {},
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-03-11T13:26:16.436Z",
+  "updatedAt": "2021-03-27T20:33:47.724Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},

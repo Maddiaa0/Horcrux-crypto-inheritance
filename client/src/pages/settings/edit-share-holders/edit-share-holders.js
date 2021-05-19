@@ -15,7 +15,7 @@ import AddressBar from "../../../components/settings/address-bar/AddressBar";
 import ConfirmDialog from "../../../components/ConfirmDialog";
 import SimpleSnackbar from "../../../components/Snackbar";
 
-//TODO:
+//TODO: ADD SO THAT IT ACTUALLY GETS IF THE PERSON HAS RECEIVED A SHARD YET!!!!!!! - just check balances are > 1 in the nft contract
 
 function EditShardHolders(){
 
@@ -28,10 +28,12 @@ function EditShardHolders(){
     // control a snackbar
     const [snackBarOpen, setSnackBarOpen] = useState(false);
 
+    const [sentShardCount, setSendShardCount] = useState(0);
+
     
     async function getCurrentShardHolders(){
         //todo: remove this for later
-        await RecoveryContractManager.getRecoveryContractForAddress("0x3341455C984441D730738cad896BcFe9A01D0cce");
+        await RecoveryContractManager.getRecoveryContractForAddress("0x2f9B8DcF85414FfEA3AC67503357F9B9d84255A8");
         const shareHolders = await RecoveryContractManager.getShardholders();
         setShardHolders(shareHolders);
         console.log(shareHolders);
@@ -66,13 +68,11 @@ function EditShardHolders(){
     function addAddressesToBlacklist(){
 
         // convert into an array of strings
-        const shardHolderArr = selectedShardholders.map(item => item.address);
-
         if (selectedShardholders.length < 1){
             // show a snack bar saying that not enough shareholders were selected
             setSnackBarOpen(true);
         } else {
-            RecoveryContractManager.batchBlacklistShardholder(shardHolderArr);  
+            RecoveryContractManager.batchBlacklistShardholder(selectedShardholders);  
         }
     }
 
@@ -81,14 +81,14 @@ function EditShardHolders(){
      * Takes the selected blacklistees and removes them from the current user's blacklist
      */
     function removeAddressesFromBlacklist(){
-        // convert into an array of strings
-        const shardHolderArr = selectedShardholders.map(item => item.address);
+        // convert into an array of string
+        console.log(selectedBlacklist)
 
         if (selectedBlacklist.length < 1){
             // show a snack bar saying that not enough shareholders were selected
             setSnackBarOpen(true);
         } else {
-            RecoveryContractManager.batchRemoveBlacklistShardholder(shardHolderArr);
+            RecoveryContractManager.batchRemoveBlacklistShardholder(selectedBlacklist);
             
         }
     }
@@ -96,14 +96,19 @@ function EditShardHolders(){
     /**
      * 
      */
-    function sendShardsToSelectedHolders(){
+    async function sendShardsToSelectedHolders(){
         // todo: remove from this testing state, just checking the currently selected transaction
         if (selectedShardholders.length < 1) {
             alert("No shardholder selected");
             return;
         }
-        const selected = selectedShardholders[0];
-        const usersPubkey = RecoveryContractManager.recoverPublicKeyFromUser(selected);
+
+        // for each of the selected, send them a shard!!
+        //TODO: CHANGE THIS FROM i BEING THE VALUE PASED IN FOR THE SHARD INDEX
+        // for (let i =0; i< selectedShardholders.length; i++){
+        await RecoveryContractManager.recoverPublicKeyFromUser(selectedShardholders[0], sentShardCount);
+        setSendShardCount(sentShardCount+ 1);
+        // }
     }
 
     function openSnackbar(){
@@ -116,12 +121,15 @@ function EditShardHolders(){
 
     return (
         <div>
-            <div>
+            <Typography>
                 Recovery Contract Address - {RecoveryContractManager.recoveryContractAddress}
-            </div>
+            </Typography>
+            <Typography>
+                NFT Address - {RecoveryContractManager.nftContractAddress}
+            </Typography>
             Edit Shardholders
             <SimpleSnackbar open={snackBarOpen} message="No Address Selected" handleClose={closeSnackbar}/>
-            <Card variant="outlined">
+            <Card variant="outlined" style={{margin:"10px"}}>
                 <CardContent>
                     <Typography color="textSecondary" gutterBottom>
                         Shardholders
@@ -153,7 +161,7 @@ function EditShardHolders(){
                 </CardActions>
             </Card>
 
-            <Card variant="outlined">
+            <Card variant="outlined" style={{margin:"10px"}}>
                 <CardContent>
                     <Typography color="textSecondary" gutterBottom>
                         Blacklisted

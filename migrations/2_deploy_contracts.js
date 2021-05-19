@@ -1,11 +1,11 @@
-const { web3, BN } = require("@openzeppelin/test-helpers/src/setup");
+const BN = require("bn.js");
 
 var ShardManagerContract = artifacts.require("ShardManager");
 var RecoveryContract = artifacts.require("Recovery");
 
 module.exports = async (deployer, network, accounts) =>  {
   // get addresses 
-  const addresses = await web3.eth.getAccounts();
+  const addresses = await accounts;
   const [goverance, notGovernance, bob, alice] = addresses;
 
   // deploy the overall managing shard manager contract

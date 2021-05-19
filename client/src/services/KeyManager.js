@@ -2,6 +2,7 @@ import { mont } from 'bn.js';
 import Crypto from 'crypto'
 import CryptoJS from 'crypto-js';
 import local from '../config/local';
+import cryptoManager from './CryptoManager';
 
 // Services
 import CryptoManager from "./CryptoManager";
@@ -45,6 +46,7 @@ class KeyManager {
     async generateAndStoreMnemonicFromPassword(password){
         const mnemonic = CryptoManager.generateMnemomic()
         this.mnemonic = mnemonic
+        console.log(mnemonic);
 
         this.setPasswordhash(password)
         this.storeMnemonicInStorage(mnemonic, password)
@@ -148,6 +150,13 @@ class KeyManager {
         localStorage.setItem("mem", encrypted);
     }
 
+
+    async importFromMnemonic(mnemonic, password){
+        this.storeMnemonicInStorage(mnemonic, password);
+        const keys = await cryptoManager.getPublicPrivateKeyAtIndex(mnemonic, 1);
+        this.storeKeysInStorage(keys, password);
+    }
+
     /**Get Mnemonic from storage
      * 
      * 
@@ -192,6 +201,18 @@ class KeyManager {
         const keys = JSON.parse(bytes.toString(CryptoJS.enc.Utf8)); 
         this.privateKey = keys.privKey;
         this.publicKey = keys.pubKey; 
+        return keys;
+    }
+
+    /**Get Access Group Key
+     * 
+     * Gets the correct encryption key relating to the accessing access group
+     * 
+     * @param {Number} accessGroup 
+     * @returns 
+     */
+    async getAccessGroupKey(accessGroup){
+        const keys = await CryptoManager.getPubPrivForAccessGroups(this.getMnemonicFromStorage("password"), accessGroup);
         return keys;
     }
 

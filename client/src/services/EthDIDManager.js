@@ -1,10 +1,9 @@
-import element from '@transmute/element-lib';
 import config from '../config';
 import web3 from 'web3';
 
 
 import EtherDID from "ethr-did";
-import { createJWT, verifyJWT, SimpleSigner, toEthereumAddress, Signer } from 'did-jwt';
+// import { createJWT, verifyJWT, SimpleSigner, toEthereumAddress, Signer } from 'did-jwt';
 
 import {Resolver } from 'did-resolver';
 import {getResolver, stringToBytes32 ,delegateTypes} from "ethr-did-resolver" 
@@ -19,11 +18,11 @@ import HttpProvider from 'ethjs-provider-http'
 // import DidRegContract from '../contracts/EthereumDIDRegistry.json'; 
 
 // get registry
-const DidRegistryContract = require("ethr-did-registry");
+// const DidRegistryContract = require("ethr-did-registry");
 
-// The kovan RPC url for my network
-const KOVAN_RPC_URL = "https://kovan.infura.io/v3/bd43a2a9349a4c05af34e872b1872563";
-const KOVAN_ADDR = "0xdca7ef03e98e0dc2b855be647c39abe984fcf21b";
+// // The kovan RPC url for my network
+// const KOVAN_RPC_URL = "https://kovan.infura.io/v3/bd43a2a9349a4c05af34e872b1872563";
+// const KOVAN_ADDR = "0xdca7ef03e98e0dc2b855be647c39abe984fcf21b";
 
 const ETHREG_REMIX_ABI = [
 	{

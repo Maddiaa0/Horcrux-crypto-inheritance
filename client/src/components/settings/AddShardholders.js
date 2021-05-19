@@ -17,6 +17,7 @@ import {ethValidatorMessages} from "../../helpers/constants/error-messages";
 import RecoveryContractManager from "../../services/RecoveryContractManager";
 // helpers
 import {isEthereumAddress} from "../../helpers/utils/utils";
+import getWeb3 from "../../getWeb3";
 
 function AddShardholders(){
 
@@ -40,8 +41,11 @@ function AddShardholders(){
     }
 
     useEffect(() => {
-        //TODO: this is a temporary measure to prevent problems while testing
-        RecoveryContractManager.getRecoveryContractForAddress("0x3341455C984441D730738cad896BcFe9A01D0cce");
+        async function effect(){
+            const web3 = await getWeb3();
+            //TODO: this is a temporary measure to prevent problems while testing
+            RecoveryContractManager.getRecoveryContractForAddress(web3.currentProvider.selectedAddress);
+        }
 
         ValidatorForm.addValidationRule("isEthAddress", (value) => {
             return (isEthereumAddress(value));
@@ -102,8 +106,8 @@ function AddShardholders(){
                     Your trustees are required to send a registration transaction to an address that will be shown to you shortly.
                     <br></br>
                     If they can not register using this address then they will not be able to initiate recovery.
-                    <br></br>
-                    Instructions to initialise recovery will be provided soon.
+                    {/* <br></br>
+                    Instructions to initialise recovery will be provided soon. */}
                 </SignUpParagraph>
                     
 
